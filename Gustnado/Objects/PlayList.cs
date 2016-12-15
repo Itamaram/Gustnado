@@ -1,5 +1,6 @@
 using System;
 using Gustnado.Converters;
+using Gustnado.Enums;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects

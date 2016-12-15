@@ -1,7 +1,7 @@
 using Gustnado.Converters;
 using Newtonsoft.Json;
 
-namespace Gustnado.Objects
+namespace Gustnado.Enums
 {
     [JsonConverter(typeof(EnumConverter<TrackType>))]
     public enum TrackType
