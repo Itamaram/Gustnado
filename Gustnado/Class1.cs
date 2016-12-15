@@ -3,11 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Gustnado.Objects;
+using Bearded.Monads;
 using Newtonsoft.Json;
 
 namespace Gustnado
 {
+    public static class OptionsExtensions
+    {
+        public static IEnumerable<A> AsEnumerable<A>(this Option<A> option)
+        {
+            return option.Map(a => a.Yield()).ElseEmpty();
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> AsParameter(this Option<string> value, string key)
+        {
+            if(value.IsSome)
+                yield return new KeyValuePair<string, string>(key, value.ForceValue());
+        } 
+    }
+
+    //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
+    public interface SoundCloudHttpClient
+    {
+        Task<T> Fetch<T>(SearchContext context, IEnumerable<KeyValuePair<string,string>> parameters);
+        Task<IEnumerable<T>> FetchMany<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters);
+    }
+
+    public class SearchContext
+    {
+        private readonly IReadOnlyList<string> terms;
+
+        public SearchContext(params string[] terms)
+        {
+            this.terms = terms.ToList();
+        }
+
+        public SearchContext(IEnumerable<string> terms)
+        {
+            this.terms = terms.ToList();
+        }
+
+        public SearchContext Add(string s)
+        {
+            return new SearchContext(new List<string>(terms) { s });
+        }
+
+        public override string ToString() => "/" + string.Join("/", terms);
+    }
+
     public interface IMakeWebRequests
     {
         Task<string> GetStringAsync(string endpoint, IEnumerable<KeyValuePair<string, string>> queries);
@@ -51,118 +94,27 @@ namespace Gustnado
         }
     }
 
-    public class ApiClient
+    public class UnauthedClient : SoundCloudHttpClient
     {
         private readonly KeyValuePair<string, string> clientId;
         private readonly IMakeWebRequests web;
 
-        public ApiClient(string clientId, IMakeWebRequests web)
+        public UnauthedClient(string clientId, IMakeWebRequests web)
         {
             this.clientId = new KeyValuePair<string, string>("client_id", clientId);
             this.web = web;
         }
 
-        public UsersRequest Users => new UsersRequest(this, new SearchContext("users"));
-
-        public async Task<T> Get<T>(SearchContext context)
+        public async Task<T> Fetch<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
         {
             var result = await web.GetStringAsync($"{Constants.ApiEndpoint}{context}", clientId.Yield());
             return JsonConvert.DeserializeObject<T>(result);
         }
-    }
 
-    public class SearchContext
-    {
-        private readonly IReadOnlyList<string> terms;
-
-        public SearchContext(params string[] terms)
+        public async Task<IEnumerable<T>> FetchMany<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
         {
-            this.terms = terms.ToList();
+            //Kind of like Fetch, only add pagination, and keep on turning them pages
+            return Enumerable.Empty<T>();
         }
-
-        public SearchContext(IEnumerable<string> terms)
-        {
-            this.terms = terms.ToList();
-        }
-
-        public SearchContext Add(string s)
-        {
-            return new SearchContext(new List<string>(terms) { s });
-        }
-
-        public override string ToString() => "/" + string.Join("/", terms);
-    }
-
-    public class UsersRequest
-    {
-        private readonly ApiClient client;
-        private readonly SearchContext context;
-
-        public UsersRequest(ApiClient client, SearchContext context)
-        {
-            this.client = client;
-            this.context = context;
-        }
-
-        public Task<IEnumerable<User>> Get(/*query?*/)
-        {
-            return client.Get<IEnumerable<User>>(context);
-        }
-
-        public UserRequest this[int id] => this[$"{id}"];
-
-        public UserRequest this[string id] => new UserRequest(client, context.Add(id));
-    }
-
-    public class UserRequest
-    {
-        private readonly ApiClient client;
-        private readonly SearchContext context;
-
-        public UserRequest(ApiClient client, SearchContext context)
-        {
-            this.client = client;
-            this.context = context;
-        }
-
-        public Task<User> Get()
-        {
-            return client.Get<User>(context);
-        }
-    }
-
-    public class TracksRequest
-    {
-        private readonly ApiClient client;
-        private readonly SearchContext context;
-
-        public TracksRequest(ApiClient client, SearchContext context)
-        {
-            this.client = client;
-            this.context = context;
-        }
-
-        public Task<IEnumerable<Track>> Get()
-        {
-            return client.Get<IEnumerable<Track>>(context);
-        }
-
-        public TrackRequest this[int id] => this[$"{id}"];
-
-        public TrackRequest this[string id] => new TrackRequest(client, context.Add(id));
-    }
-
-    public class TrackRequest
-    {
-        private readonly ApiClient client;
-        private readonly SearchContext context;
-
-        public TrackRequest(ApiClient client, SearchContext context)
-        {
-            this.client = client;
-            this.context = context;
-        }
-
-        public Task<Track> Get() => client.Get<Track>(context);
     }
 }
