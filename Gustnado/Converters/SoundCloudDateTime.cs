@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Gustnado.Converters
 {
-    public class DateTimeConverter : JsonConverter
+    public class SoundCloudDateTime : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

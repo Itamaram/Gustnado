@@ -1,5 +1,6 @@
 ﻿using System;
 using Gustnado.Converters;
+using Gustnado.Objects;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
