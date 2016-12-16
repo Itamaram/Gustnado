@@ -19,7 +19,24 @@ namespace Gustnado
         {
             if(value.IsSome)
                 yield return new KeyValuePair<string, string>(key, value.ForceValue());
+        }
+
+        public static Option<B> MaybeGetReadonlyValue<A, B>(this IReadOnlyDictionary<A, B> d, A key)
+        {
+            B b;
+            return d.TryGetValue(key, out b) ? b : Option<B>.None;
         } 
+    }
+
+    public static class ObjectExtensions
+    {
+        public static A Do<A>(this A a, Action<A> action)
+        {
+            action(a);
+            return a;
+        }
+
+        public static B Map<A, B>(this A a, Func<A, B> map) => map(a);
     }
 
     //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
@@ -92,11 +109,26 @@ namespace Gustnado
         {
             yield return a;
         }
+
+        public static IEnumerable<A> Concat<A>(this IEnumerable<A> items, A item)
+        {
+            foreach (var a in items)
+                yield return a;
+
+            yield return item;
+        } 
     }
 
     public class UnauthedClient : SoundCloudHttpClient
     {
         private readonly KeyValuePair<string, string> clientId;
+
+        private readonly KeyValuePair<string, string>[] pagination =
+        {
+            new KeyValuePair<string, string>("linked_partitioning", "1"),
+            new KeyValuePair<string, string>("limit", "50")
+        };
+         
         private readonly IMakeWebRequests web;
 
         public UnauthedClient(string clientId, IMakeWebRequests web)
@@ -104,6 +136,8 @@ namespace Gustnado
             this.clientId = new KeyValuePair<string, string>("client_id", clientId);
             this.web = web;
         }
+
+        //include a second ctor for auth, make both ctor private, user factory?
 
         public async Task<T> Fetch<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
         {
@@ -113,8 +147,34 @@ namespace Gustnado
 
         public async Task<IEnumerable<T>> FetchMany<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
         {
-            //Kind of like Fetch, only add pagination, and keep on turning them pages
-            return Enumerable.Empty<T>();
+            //todo allow custom pagination, building of own requests
+
+            var result = new List<T>();
+            
+            var next = (await web.GetStringAsync($"{Constants.ApiEndpoint}{context}", parameters.Concat(clientId).Concat(pagination)))
+                .Map(JsonConvert.DeserializeObject<PaginationResult<T>>)
+                .Do(p => result.AddRange(p.Collection))
+                .Map(p => p.NextHref);
+
+            while (next != null)
+            {
+                Console.WriteLine($"fetching {next}");
+                next = (await web.GetStringAsync(next, Enumerable.Empty<KeyValuePair<string, string>>()))
+                    .Map(JsonConvert.DeserializeObject<PaginationResult<T>>)
+                    .Do(p => result.AddRange(p.Collection))
+                    .Map(p => p.NextHref);
+            }
+
+            return result;
         }
+    }
+
+    public class PaginationResult<T>
+    {
+        [JsonProperty("collection")]
+        public List<T> Collection { get; set; } 
+
+        [JsonProperty("next_href")]
+        public string NextHref { get; set; }  
     }
 }

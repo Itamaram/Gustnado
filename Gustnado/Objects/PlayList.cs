@@ -196,6 +196,6 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"recording"</example>
         [JsonProperty("playlist_type")]
-        public PlaylistType PlaylistType { get; set; }
+        public PlaylistType? PlaylistType { get; set; }
     }
 }

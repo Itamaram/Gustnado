@@ -25,7 +25,7 @@ namespace Gustnado.Requests
 
     public interface UnauthedUsersRequest
     {
-        Task<IEnumerable<User>> Get(int id, Option<string> q);
+        Task<IEnumerable<User>> Get(Option<string> q);
         UnauthedUserRequest this[int id] { get; }
     }
 
@@ -40,7 +40,7 @@ namespace Gustnado.Requests
             this.context = context;
         }
 
-        public Task<IEnumerable<User>> Get(int id, Option<string> q)
+        public Task<IEnumerable<User>> Get(Option<string> q)
         {
             return client.FetchMany<User>(context, q.AsParameter("q"));
         }
@@ -80,6 +80,9 @@ namespace Gustnado.Requests
         {
             return client.FetchMany<T>(context, Enumerable.Empty<KeyValuePair<string, string>>());
         }
+
+        //todo this isn't pretty
+        public static Task<IEnumerable<User>> Get(this UnauthedUsersRequest r) => r.Get(Option<string>.None);
     }
 
     public interface UnauthedUserRequest
@@ -252,7 +255,7 @@ namespace Gustnado.Requests
 
         public Task<IEnumerable<Track>> Get() => client.FetchMany<Track>(context);
 
-        public UnauthedFavoriteRequest this[int id] => new FavoriteRequest(client, context);
+        public UnauthedFavoriteRequest this[int id] => new FavoriteRequest(client, context.Add($"{id}"));
     }
 
     public interface UnauthedFavoriteRequest

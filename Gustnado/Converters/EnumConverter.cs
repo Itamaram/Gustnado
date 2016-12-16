@@ -8,7 +8,7 @@ namespace Gustnado.Converters
 {
     public class EnumConverter<T> : JsonConverter
     {
-        private readonly IReadOnlyDictionary<string, T> fromJson;
+        private readonly IReadOnlyDictionary<string, object> fromJson;
         private readonly IReadOnlyDictionary<T, string> toJson;
 
         public EnumConverter()
@@ -18,9 +18,9 @@ namespace Gustnado.Converters
             
             fromJson = Enum.GetNames(typeof(T)).Select(name => typeof(T).GetMember(name).Single()).ToDictionary(
                 m => m.GetCustomAttributes().OfType<JsonValueAttribute>().Single().Value,
-                m => (T) Enum.Parse(typeof (T), m.Name));
+                m => Enum.Parse(typeof (T), m.Name));
 
-            toJson = fromJson.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+            toJson = fromJson.ToDictionary(kvp =>(T) kvp.Value, kvp => kvp.Key);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -30,7 +30,7 @@ namespace Gustnado.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return fromJson[reader.Value.ToString()];
+            return reader.Value?.ToString().Map(fromJson.MaybeGetReadonlyValue).ElseDefault();
         }
 
         public override bool CanConvert(Type type) => type == typeof(T);

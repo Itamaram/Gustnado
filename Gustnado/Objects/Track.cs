@@ -201,7 +201,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"recording"</example>
         [JsonProperty("track_type")]
-        public TrackType TrackType { get; set; }
+        public TrackType? TrackType { get; set; }
 
         /// <summary>
         /// URL to PNG waveform image
@@ -236,7 +236,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>120</example>
         [JsonProperty("bpm")]
-        public int BPM { get; set; }
+        public int? BPM { get; set; }
 
         /// <summary>
         /// track commentable (boolean)
