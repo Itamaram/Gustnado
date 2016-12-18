@@ -83,6 +83,8 @@ namespace Gustnado
             return new SearchContext(new List<string>(terms) { s });
         }
 
+        public SearchContext Add(int id) => Add($"{id}");
+
         public override string ToString() => "/" + string.Join("/", terms);
     }
 

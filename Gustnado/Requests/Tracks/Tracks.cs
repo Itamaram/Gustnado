@@ -10,18 +10,37 @@ using Gustnado.Objects;
 
 namespace Gustnado.Requests.Tracks
 {
-    public interface UnauthedTracksRequest
-    {
-        Task<IEnumerable<Track>> Get(Option<TracksRequestFilter> filter);
-        UnauthedTrackRequest this[int id] { get; }
-    }
-
     public static class UnauthedTracksRequestExtensions
     {
         public static Task<IEnumerable<Track>> Get(this UnauthedTracksRequest r)
         {
             return r.Get(Option<TracksRequestFilter>.None);
         }
+    }
+
+    public interface UnauthedTracksRequest
+    {
+        Task<IEnumerable<Track>> Get(Option<TracksRequestFilter> filter);
+        UnauthedTrackRequest this[int id] { get; }
+    }
+
+    public class TracksRequest : UnauthedTracksRequest
+    {
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
+
+        public TracksRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<IEnumerable<Track>> Get(Option<TracksRequestFilter> filter)
+        {
+            return client.FetchMany<Track>(context, filter.Map(QueryStringFormatter.FromObject).ElseEmpty());
+        }
+
+        public UnauthedTrackRequest this[int id] => new TrackRequest(client, context.Add(id));
     }
 
     public interface UnauthedTrackRequest
@@ -32,15 +51,21 @@ namespace Gustnado.Requests.Tracks
         //secret token? Can you get it if unauthed? Surely not?
     }
 
-    public interface UnauthedCommentsRequest
+    public class TrackRequest : UnauthedTrackRequest
     {
-        Task<IEnumerable<Comment>> Get();
-        UnauthedCommentRequest this[int id] { get; }
-    }
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
 
-    public interface UnauthedCommentRequest
-    {
-        Task<Comment> Get();
+        public TrackRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<Track> Get() => client.Fetch<Track>(context);
+
+        public UnauthedCommentsRequest Comments => new CommentsRequest(client, context.Add("comments"));
+        public UnauthedFavoritesRequest Favorites => new FavoritesRequest(client, context.Add("favorites"));
     }
 
     public interface UnauthedFavoritesRequest
@@ -49,9 +74,80 @@ namespace Gustnado.Requests.Tracks
         UnauthedFavoriteRequest this[int id] { get; }
     }
 
+    public class FavoritesRequest : UnauthedFavoritesRequest
+    {
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
+
+        public FavoritesRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<IEnumerable<User>> Get() => client.FetchMany<User>(context);
+
+        public UnauthedFavoriteRequest this[int id] => new FavoriteRequest(client, context.Add(id));
+    }
+
+    public interface UnauthedCommentsRequest
+    {
+        Task<IEnumerable<Comment>> Get();
+        UnauthedCommentRequest this[int id] { get; }
+    }
+
+    public class CommentsRequest : UnauthedCommentsRequest
+    {
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
+
+        public CommentsRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<IEnumerable<Comment>> Get() => client.FetchMany<Comment>(context);
+
+        public UnauthedCommentRequest this[int id] => new CommentRequest(client, context.Add(id));
+    }
+
     public interface UnauthedFavoriteRequest
     {
         Task<User> Get();
+    }
+
+    public class FavoriteRequest : UnauthedFavoriteRequest
+    {
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
+
+        public FavoriteRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<User> Get() => client.Fetch<User>(context);
+    }
+
+    public interface UnauthedCommentRequest
+    {
+        Task<Comment> Get();
+    }
+
+    public class CommentRequest : UnauthedCommentRequest
+    {
+        private readonly SoundCloudHttpClient client;
+        private readonly SearchContext context;
+
+        public CommentRequest(SoundCloudHttpClient client, SearchContext context)
+        {
+            this.client = client;
+            this.context = context;
+        }
+
+        public Task<Comment> Get() => client.Fetch<Comment>(context);
     }
 
     public interface ParameterFormatter
