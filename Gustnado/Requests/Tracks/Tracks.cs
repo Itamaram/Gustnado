@@ -10,7 +10,7 @@ using Gustnado.Objects;
 
 namespace Gustnado.Requests.Tracks
 {
-    public static class UnauthedTracksRequestExtensions
+    public static class TracksRequestExtensions
     {
         public static Task<IEnumerable<Track>> Get(this UnauthedTracksRequest r)
         {
@@ -22,6 +22,35 @@ namespace Gustnado.Requests.Tracks
     {
         Task<IEnumerable<Track>> Get(Option<TracksRequestFilter> filter);
         UnauthedTrackRequest this[int id] { get; }
+    }
+
+    public interface AuthedTracksRequest
+    {
+        Task<IEnumerable<Track>> Get(Option<TracksRequestFilter> filter);
+        Task<Track> Post(Track track);
+        AuthedTrackRequest this[int id] { get; }
+    }
+
+    public interface AuthedTrackRequest
+    {
+        Task<Track> Get();
+        Task<Track> Put(Track track);
+        Task<Track> Delete();
+        AuthedCommentsRequest Comments { get; }
+        AuthedFavoritersRequest Favoriters { get; }
+        AuthedSecretTokenRequest SecretToken { get; }
+    }
+
+    public interface AuthedFavoritersRequest
+    {
+
+    }
+
+    public interface AuthedCommentsRequest
+    {
+        Task<IEnumerable<Comment>> Get();
+        Task<Comment> Post(Comment comment);
+        AuthedCommentRequest this[int id] { get; }
     }
 
     public class TracksRequest : UnauthedTracksRequest
@@ -47,7 +76,7 @@ namespace Gustnado.Requests.Tracks
     {
         Task<Track> Get();
         UnauthedCommentsRequest Comments { get; }
-        UnauthedFavoritesRequest Favorites { get; }
+        UnauthedFavoritersRequest Favoriters { get; }
         //secret token? Can you get it if unauthed? Surely not?
     }
 
@@ -65,21 +94,21 @@ namespace Gustnado.Requests.Tracks
         public Task<Track> Get() => client.Fetch<Track>(context);
 
         public UnauthedCommentsRequest Comments => new CommentsRequest(client, context.Add("comments"));
-        public UnauthedFavoritesRequest Favorites => new FavoritesRequest(client, context.Add("favorites"));
+        public UnauthedFavoritersRequest Favoriters => new FavoritersRequest(client, context.Add("favoriters"));
     }
 
-    public interface UnauthedFavoritesRequest
+    public interface UnauthedFavoritersRequest
     {
         Task<IEnumerable<User>> Get();
         UnauthedFavoriteRequest this[int id] { get; }
     }
 
-    public class FavoritesRequest : UnauthedFavoritesRequest
+    public class FavoritersRequest : UnauthedFavoritersRequest
     {
         private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FavoritesRequest(SoundCloudHttpClient client, SearchContext context)
+        public FavoritersRequest(SoundCloudHttpClient client, SearchContext context)
         {
             this.client = client;
             this.context = context;
