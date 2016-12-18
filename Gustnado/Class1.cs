@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bearded.Monads;
+using Gustnado.Requests.Tracks;
+using Gustnado.Requests.Users;
 using Newtonsoft.Json;
 
 namespace Gustnado
@@ -37,6 +40,21 @@ namespace Gustnado
         }
 
         public static B Map<A, B>(this A a, Func<A, B> map) => map(a);
+
+        //public static Option<A> GetCustomAttribute<A>(this Type type) where A:Attribute
+        //{
+        //    return type.GetCustomAttributes(typeof (A), true).OfType<A>().FirstOrNone();
+        //}
+    }
+
+    public static class ReflectionExtensions
+    {
+        public static Option<A> GetCustomAttribute<A>(this PropertyInfo property) where A : Attribute
+        {
+            return property.GetCustomAttributes<A>().SingleOrNone();
+        }
+
+        public static object Invoke(this MethodBase m, object o) => m.Invoke(o, new object[0]);
     }
 
     //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
@@ -116,7 +134,30 @@ namespace Gustnado
                 yield return a;
 
             yield return item;
+        }
+
+        public static IEnumerable<Tuple<A, B>> Let<A, B>(this IEnumerable<A> items, Func<A, B> selector)
+        {
+            return items.Select(a => new Tuple<A, B>(a, selector(a)));
+        }
+
+        public static IEnumerable<Tuple<A, B>> ConcatOptions<A, B>(this IEnumerable<Tuple<A, Option<B>>> items)
+        {
+            return items.SelectMany(t => t.Item2.AsEnumerable().Select(b => new Tuple<A, B>(t.Item1, b)));
+        }
+
+        public static IEnumerable<C> Select<A, B, C>(this IEnumerable<Tuple<A, B>> items, Func<A, B, C> selector)
+        {
+            return items.Select(t => selector(t.Item1, t.Item2));
         } 
+    }
+
+    public static class ParameterFormatterExtensions
+    {
+        public static ParameterFormatter AsParameterFormatter(this Type type)
+        {
+            return Activator.CreateInstance(type) as ParameterFormatter;
+        }
     }
 
     public class UnauthedClient : SoundCloudHttpClient
@@ -158,7 +199,6 @@ namespace Gustnado
 
             while (next != null)
             {
-                Console.WriteLine($"fetching {next}");
                 next = (await web.GetStringAsync(next, Enumerable.Empty<KeyValuePair<string, string>>()))
                     .Map(JsonConvert.DeserializeObject<PaginationResult<T>>)
                     .Do(p => result.AddRange(p.Collection))
@@ -175,6 +215,23 @@ namespace Gustnado
         public List<T> Collection { get; set; } 
 
         [JsonProperty("next_href")]
-        public string NextHref { get; set; }  
+        public string NextHref { get; set; }
+    }
+
+    public interface UnauthedApiClient
+    {
+        UnauthedUsersRequest Users { get; }
+    }
+
+    public class ApiClient : UnauthedApiClient
+    {
+        private readonly SoundCloudHttpClient client;
+
+        public ApiClient(SoundCloudHttpClient client)
+        {
+            this.client = client;
+        }
+
+        public UnauthedUsersRequest Users => new UsersRequest(client, new SearchContext("users"));
     }
 }
