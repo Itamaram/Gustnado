@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Gustnado.Objects
 {
-    [HttpBodyKeyFormat("track[{0}]")]
+    [RequestBodyKeyFormat("track[{0}]")]
     public class Track
     {
         /// <summary>
@@ -308,8 +308,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>(only for uploading)</example>
         [JsonProperty("asset_data")]
-        [JsonIgnore]
-        [HttpBodyFile]
+        [JsonConverter(typeof(AddToRequestBodyAsFile))]
         public string AssetData { get; set; }
 
         /// <summary>

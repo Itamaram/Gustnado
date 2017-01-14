@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Bearded.Monads;
 using Gustnado.Requests.Tracks;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Gustnado.Extensions
@@ -70,6 +71,17 @@ namespace Gustnado.Extensions
         public static T AddQueryParameters<T>(this T request, IEnumerable<KeyValuePair<string, string>> parameters) where T: IRestRequest
         {
             return parameters.Aggregate(request, (r, p) => r.AddQueryParameter(p));
+        }
+
+        public static Request AddToRequestBody<Request, T>(this Request request, T item) where Request: IRestRequest
+        {
+            var format = typeof (T).GetCustomAttribute<RequestBodyKeyFormatAttribute>()
+                .Map(a => a.Format);
+
+            JsonSerializer.Create(new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore})
+                .Serialize(new RequestBodyWriter(request, format), item);
+
+            return request;
         }
     }
 }

@@ -10,11 +10,9 @@ namespace Gustnado.Requests.Tracks
         public RestRequest(SearchContext context, Method method)
             : base(context.AsResource(), method) { }
 
-        public RestRequest<T> AddSoundCloudObject(object obj)
+        public RestRequest<T> AddSoundCloudObject<A>(A item)
         {
-            //foreach decorated attribute, use attribute to decide how to add to body
-            //mostly includes key, and whether or not it is a file
-            return this;
+            return this.AddToRequestBody(item);
         }
 
         public static RestRequest<T> Get(SearchContext context)

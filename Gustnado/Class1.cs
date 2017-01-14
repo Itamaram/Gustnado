@@ -45,10 +45,13 @@ namespace Gustnado
 
         public static B Map<A, B>(this A a, Func<A, B> map) => map(a);
 
-        //public static Option<A> GetCustomAttribute<A>(this Type type) where A:Attribute
-        //{
-        //    return type.GetCustomAttributes(typeof (A), true).OfType<A>().FirstOrNone();
-        //}
+        public static Option<A> GetCustomAttribute<A>(this Type type) where A : Attribute
+        {
+            return type.GetCustomAttributes()
+                .Select(a => a.MaybeCast<A>())
+                .ConcatOptions()
+                .FirstOrNone();
+        }
     }
 
     public static class ReflectionExtensions

@@ -9,6 +9,9 @@ using Gustnado.Enums;
 using Gustnado.Objects;
 using Newtonsoft.Json;
 using RestSharp;
+using RestSharp.Deserializers;
+using RestSharp.Serializers;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Gustnado.Requests.Tracks
 {
@@ -339,63 +342,106 @@ namespace Gustnado.Requests.Tracks
         }
     }
 
-    public static class HttpBodyProvider
+    public class RequestBodyWriter : JsonWriter
     {
-        public static void AddToRequestBody<T>(IRestRequest request, T t)
+        private readonly IRestRequest request;
+        private readonly string format;
+        public RequestBodyWriter(IRestRequest request, Option<string> format)
         {
-            var format = typeof(T).GetCustomAttribute<HttpBodyKeyFormatAttribute>()
-                .Map(a => a.Format)
-                .Else(() => "{0}");
-
-            foreach (var property in typeof(T).GetProperties())
-            {
-                property.GetCustomAttribute<JsonPropertyAttribute>()
-                    .And(property.GetMethod.Invoke(t).AsOption())
-                    .Then((j, v) => new {Key = j.PropertyName, Value = v})
-                    .WhenSome(x => property.GetCustomAttribute<HttpBodyAttribute>()
-                        .Else(() => new HttpBodyTuple())
-                        .AddToBody(request, format, x.Key, x.Value));
-            }
+            this.request = request;
+            this.format = format.Else(() => "{0}");
+        }
+        private string key;
+        public override void WritePropertyName(string name, bool escape)
+        {
+            key = string.Format(format, name);
+            base.WritePropertyName(name, escape);
+        }
+        private void Write(object obj)
+        {
+            obj.AsOption()
+                .WhenSome(value => request.AddParameter(key, value, ParameterType.RequestBody));
+        }
+        public override void WriteValue(string value)
+        {
+            Write(value);
+            base.WriteValue(value);
+        }
+        public override void WriteValue(int value)
+        {
+            Write(value);
+            base.WriteValue(value);
+        }
+        public override void WriteValue(bool value)
+        {
+            Write(value);
+            base.WriteValue(value);
+        }
+        public void WriteFile(string path)
+        {
+            request.AddFile(key, path);
+            base.WriteValue(path);
+        }
+        public override void Flush()
+        {
         }
     }
 
+    public class AddToRequestBodyAsFile : JsonConverter
+    {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.MaybeCast<RequestBodyWriter>()
+                .WhenSome(w => w.WriteFile((string)value))
+                //Note that this leaves us with a null regardless of serialisation settings, as the prop name had already been written at this point
+                .WhenNone(writer.WriteNull);
+        }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => null;
+        public override bool CanConvert(Type type) => type == typeof(string);
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class HttpBodyKeyFormatAttribute : Attribute
+    public class RequestBodyKeyFormatAttribute : Attribute
     {
         public string Format { get; }
-
-        public HttpBodyKeyFormatAttribute(string format)
+        public RequestBodyKeyFormatAttribute(string format)
         {
             Format = format;
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public abstract class HttpBodyAttribute : Attribute
+    public class CustomSerializer : ISerializer, IDeserializer
     {
-        public abstract void AddToBody(IRestRequest request, string format, string name, object value);
-    }
+        private readonly JsonSerializerSettings settings;
 
-    public class HttpBodyFile : HttpBodyAttribute
-    {
-        public override void AddToBody(IRestRequest request, string format, string name, object value)
+        public CustomSerializer() : this(new JsonSerializerSettings()) { }
+
+        public CustomSerializer(JsonSerializerSettings settings)
         {
-            value.MaybeCast<string>()
-                .WhenSome(path => request.AddFile(string.Format(format, name), path));
+            this.settings = settings;
         }
-    }
 
-    public class HttpBodyTuple : HttpBodyAttribute
-    {
-        public override void AddToBody(IRestRequest request, string format, string name, object value)
+        public string Serialize(object obj)
         {
-            if (value != null)
-                request.AddParameter(string.Format(format, name), value, ParameterType.RequestBody);
+            return JsonConvert.SerializeObject(obj, settings);
         }
-    }
 
-    public class HttpBodyIgnore : HttpBodyAttribute
-    {
-        public override void AddToBody(IRestRequest request, string format, string name, object value) { }
+        public T Deserialize<T>(IRestResponse response)
+        {
+            return JsonConvert.DeserializeObject<T>(response.Content, settings);
+        }
+
+        public static CustomSerializer Default = new CustomSerializer(new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        });
+
+        string IDeserializer.RootElement { get; set; }
+        string IDeserializer.Namespace { get; set; }
+        string IDeserializer.DateFormat { get; set; }
+        string ISerializer.RootElement { get; set; }
+        string ISerializer.Namespace { get; set; }
+        string ISerializer.DateFormat { get; set; }
+        public string ContentType { get; set; }
     }
 }
