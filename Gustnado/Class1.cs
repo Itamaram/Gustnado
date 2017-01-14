@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bearded.Monads;
+using Gustnado.Extensions;
+using Gustnado.Objects;
 using Gustnado.Requests.Tracks;
 using Gustnado.Requests.Users;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace Gustnado
 {
@@ -49,6 +53,13 @@ namespace Gustnado
 
     public static class ReflectionExtensions
     {
+        public static IEnumerable<A> GetCustomAttributes<A>(this PropertyInfo property) where A : Attribute
+        {
+            return property.GetCustomAttributes()
+                .Select(a => a.MaybeCast<A>())
+                .ConcatOptions();
+        }
+
         public static Option<A> GetCustomAttribute<A>(this PropertyInfo property) where A : Attribute
         {
             return property.GetCustomAttributes<A>().SingleOrNone();
@@ -57,14 +68,49 @@ namespace Gustnado
         public static object Invoke(this MethodBase m, object o) => m.Invoke(o, new object[0]);
     }
 
+
+
     //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
-    public interface SoundCloudHttpClient
+    public class SoundCloudHttpClient
     {
-        Task<T> Fetch<T>(SearchContext context, IEnumerable<KeyValuePair<string,string>> parameters);
-        Task<IEnumerable<T>> FetchMany<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters);
+        private readonly string clientId;
+        private readonly IRestClient http;
+
+        //todo Ensure client is fed the deserialiser
+        public SoundCloudHttpClient(string clientId, IRestClient http)
+        {
+            this.clientId = clientId;
+            this.http = http;
+        }
+
+        public T Execute<T>(RestRequest<T> request) where T : new()
+        {
+            //todo Add auth if authed? Or is that a different class?
+            //todo error handling :/
+            return request.AddQueryParameter("client_id", clientId)
+                .Map(r => http.Execute<T>(r).Data);
+        }
+
+        public IEnumerable<T> Execute<T>(RestRequestMany<T> request, int limit = 50)
+        {
+            var page = request.AddQueryParameter("client_id", clientId)
+                .AddQueryParameter("linked_partitioning", "1")
+                .AddQueryParameter("limit", limit.ToString())
+                .Map(r => http.Execute<PaginationResult<T>>(r).Data);
+            
+            foreach (var item in page.Collection)
+                yield return item;
+
+            while (page.NextHref != null)
+            {
+                page = http.Execute<PaginationResult<T>>(new RestRequest(page.NextHref)).Data;
+                foreach (var item in page.Collection)
+                    yield return item;
+            }
+        }
     }
 
-    public class SearchContext
+    public class SearchContext : IEnumerable<string>
     {
         private readonly IReadOnlyList<string> terms;
 
@@ -83,132 +129,16 @@ namespace Gustnado
             return new SearchContext(new List<string>(terms) { s });
         }
 
-        public SearchContext Add(int id) => Add($"{id}");
+        public SearchContext Add(int id) => Add(id.ToString());
 
-        public override string ToString() => "/" + string.Join("/", terms);
-    }
+        public IEnumerator<string> GetEnumerator() => terms.GetEnumerator();
 
-    public interface IMakeWebRequests
-    {
-        Task<string> GetStringAsync(string endpoint, IEnumerable<KeyValuePair<string, string>> queries);
-    }
-
-    public class HttpClientImplementation : IMakeWebRequests, IDisposable
-    {
-        private readonly HttpClient client;
-        public HttpClientImplementation()
-        {
-            client = new HttpClient();
-        }
-
-        public Task<string> GetStringAsync(string endpoint, IEnumerable<KeyValuePair<string, string>> queries)
-        {
-            var query = QueryString(queries);
-            return client.GetStringAsync(endpoint + (query.Any() ? "?" + query : string.Empty));
-        }
-
-        private static string QueryString(IEnumerable<KeyValuePair<string, string>> queries)
-        {
-            return string.Join("&", queries.Select(q => $"{q.Key}={q.Value}"));
-        }
-
-        public void Dispose()
-        {
-            client.Dispose();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public static class Constants
     {
         public static string ApiEndpoint = "http://api.soundcloud.com";
-    }
-
-    public static class EnumerableExtensions
-    {
-        public static IEnumerable<A> Yield<A>(this A a)
-        {
-            yield return a;
-        }
-
-        public static IEnumerable<A> Concat<A>(this IEnumerable<A> items, A item)
-        {
-            foreach (var a in items)
-                yield return a;
-
-            yield return item;
-        }
-
-        public static IEnumerable<Tuple<A, B>> Let<A, B>(this IEnumerable<A> items, Func<A, B> selector)
-        {
-            return items.Select(a => new Tuple<A, B>(a, selector(a)));
-        }
-
-        public static IEnumerable<Tuple<A, B>> ConcatOptions<A, B>(this IEnumerable<Tuple<A, Option<B>>> items)
-        {
-            return items.SelectMany(t => t.Item2.AsEnumerable().Select(b => new Tuple<A, B>(t.Item1, b)));
-        }
-
-        public static IEnumerable<C> Select<A, B, C>(this IEnumerable<Tuple<A, B>> items, Func<A, B, C> selector)
-        {
-            return items.Select(t => selector(t.Item1, t.Item2));
-        } 
-    }
-
-    public static class ParameterFormatterExtensions
-    {
-        public static ParameterFormatter AsParameterFormatter(this Type type)
-        {
-            return Activator.CreateInstance(type) as ParameterFormatter;
-        }
-    }
-
-    public class UnauthedClient : SoundCloudHttpClient
-    {
-        private readonly KeyValuePair<string, string> clientId;
-
-        private readonly KeyValuePair<string, string>[] pagination =
-        {
-            new KeyValuePair<string, string>("linked_partitioning", "1"),
-            new KeyValuePair<string, string>("limit", "50")
-        };
-         
-        private readonly IMakeWebRequests web;
-
-        public UnauthedClient(string clientId, IMakeWebRequests web)
-        {
-            this.clientId = new KeyValuePair<string, string>("client_id", clientId);
-            this.web = web;
-        }
-
-        //include a second ctor for auth, make both ctor private, user factory?
-
-        public async Task<T> Fetch<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
-        {
-            var result = await web.GetStringAsync($"{Constants.ApiEndpoint}{context}", clientId.Yield());
-            return JsonConvert.DeserializeObject<T>(result);
-        }
-
-        public async Task<IEnumerable<T>> FetchMany<T>(SearchContext context, IEnumerable<KeyValuePair<string, string>> parameters)
-        {
-            //todo allow custom pagination, building of own requests
-
-            var result = new List<T>();
-            
-            var next = (await web.GetStringAsync($"{Constants.ApiEndpoint}{context}", parameters.Concat(clientId).Concat(pagination)))
-                .Map(JsonConvert.DeserializeObject<PaginationResult<T>>)
-                .Do(p => result.AddRange(p.Collection))
-                .Map(p => p.NextHref);
-
-            while (next != null)
-            {
-                next = (await web.GetStringAsync(next, Enumerable.Empty<KeyValuePair<string, string>>()))
-                    .Map(JsonConvert.DeserializeObject<PaginationResult<T>>)
-                    .Do(p => result.AddRange(p.Collection))
-                    .Map(p => p.NextHref);
-            }
-
-            return result;
-        }
     }
 
     public class PaginationResult<T>

@@ -1,10 +1,12 @@
 using System;
 using Gustnado.Converters;
 using Gustnado.Enums;
+using Gustnado.Requests.Tracks;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects
 {
+    [HttpBodyKeyFormat("track[{0}]")]
     public class Track
     {
         /// <summary>
@@ -306,7 +308,9 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>(only for uploading)</example>
         [JsonProperty("asset_data")]
-        public object AssetData { get; set; } //todo blob? bytes?
+        [JsonIgnore]
+        [HttpBodyFile]
+        public string AssetData { get; set; }
 
         /// <summary>
         /// binary data of the artwork image
