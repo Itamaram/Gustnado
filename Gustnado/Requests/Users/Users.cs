@@ -1,265 +1,167 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Bearded.Monads;
+﻿using Bearded.Monads;
 using Gustnado.Objects;
+using Gustnado.Requests.Tracks;
 
 namespace Gustnado.Requests.Users
 {
-    public interface UnauthedUsersRequest
+    public class UsersRequest
     {
-        Task<IEnumerable<User>> Get(Option<string> q);
-        UnauthedUserRequest this[int id] { get; }
+        private static readonly SearchContext context = new SearchContext("users");
+
+        public RestRequestMany<User> Get() => Get(Option<string>.None);
+
+        public RestRequestMany<User> Get(Option<string> q)
+        {
+            return new RestRequestMany<User>(context)
+                .Do(r => q.WhenSome(query => r.AddQueryParameter("q", query)));
+        }
+
+        public UserRequest this[int id] => new UserRequest(context, id);
     }
 
-    public class UsersRequest : UnauthedUsersRequest
+    public class UserRequest
     {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public UsersRequest(SoundCloudHttpClient client, SearchContext context)
+        public UserRequest(SearchContext context, int id)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add(id);
         }
 
-        public Task<IEnumerable<User>> Get(Option<string> q)
-        {
-            return client.FetchMany<User>(context, q.AsParameter("q"));
-        }
+        public RestRequest<User> Get() => RestRequest<User>.Get(context);
 
-        public UnauthedUserRequest this[int id] => new UserRequest(client, context.Add($"{id}"));
+        public UserTracksRequest Tracks => new UserTracksRequest(context);
+        public UserPlaylistsRequest Playlists => new UserPlaylistsRequest(context);
+        public FollowingsRequest Followings => new FollowingsRequest( context);
+        public FollowersRequest Followers => new FollowersRequest( context);
+        public CommentsRequest Comments => new CommentsRequest( context);
+        public FavoritesRequest Favorites => new FavoritesRequest( context);
+        public WebProfilesRequest WebProfiles => new WebProfilesRequest( context);
     }
-
-    public class UserRequest : UnauthedUserRequest
+    
+    public class UserTracksRequest
     {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public UserRequest(SoundCloudHttpClient client, SearchContext context)
+        public UserTracksRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("tracks");
         }
 
-        public Task<User> Get() => client.Fetch<User>(context);
-
-        public UnauthedTracksRequest Tracks => new TracksRequest(client, context.Add("tracks"));
-        public UnauthedPlaylistsRequest Playlists => new PlaylistsRequest(client, context.Add("playlists"));
-        public UnauthedFollowingsRequest Followings => new FollowingsRequest(client, context.Add("followings"));
-        public UnauthedFollowersRequest Followers => new FollowersRequest(client, context.Add("followers"));
-        public UnauthedCommentsRequest Comments => new CommentsRequest(client, context.Add("comments"));
-        public UnauthedFavoritesRequest Favorites => new FavoritesRequest(client, context.Add("favorites"));
-        public UnauthedWebProfilesRequest WebProfiles => new WebProfilesRequest(client, context.Add("web-profiles"));
+        public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
     }
-
-    public interface UnauthedUserRequest
+    
+    public class UserPlaylistsRequest
     {
-        Task<User> Get();
-        UnauthedTracksRequest Tracks { get; }
-        UnauthedPlaylistsRequest Playlists { get; }
-        UnauthedFollowingsRequest Followings { get; }
-        UnauthedFollowersRequest Followers { get; }
-        UnauthedCommentsRequest Comments { get; }
-        UnauthedFavoritesRequest Favorites { get; }
-        UnauthedWebProfilesRequest WebProfiles { get; }
-    }
-
-    public interface UnauthedTracksRequest
-    {
-        Task<IEnumerable<Track>> Get();
-    }
-
-    public class TracksRequest : UnauthedTracksRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public TracksRequest(SoundCloudHttpClient client, SearchContext context)
+        public UserPlaylistsRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("playlists");
         }
 
-        public Task<IEnumerable<Track>> Get() => client.FetchMany<Track>(context);
+        public RestRequestMany<PlayList> Get() => new RestRequestMany<PlayList>(context);
     }
 
-    public interface UnauthedPlaylistsRequest
+    public class FollowingsRequest
     {
-        Task<IEnumerable<PlayList>> Get();
-    }
-
-    public class PlaylistsRequest : UnauthedPlaylistsRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public PlaylistsRequest(SoundCloudHttpClient client, SearchContext context)
+        public FollowingsRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("followings");
         }
 
-        public Task<IEnumerable<PlayList>> Get() => client.FetchMany<PlayList>(context);
+        public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
+
+        public UserFollowingRequest this[int id] => new UserFollowingRequest(context, id);
     }
 
-    public interface UnauthedFollowingsRequest
+    public class UserFollowingRequest
     {
-        Task<IEnumerable<User>> Get();
-        UnauthedFollowingRequest this[int id] { get; }
-    }
-
-    public class FollowingsRequest : UnauthedFollowingsRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FollowingsRequest(SoundCloudHttpClient client, SearchContext context)
+        public UserFollowingRequest(SearchContext context, int id)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add(id);
         }
 
-        public Task<IEnumerable<User>> Get() => client.FetchMany<User>(context);
-
-        public UnauthedFollowingRequest this[int id] => new FollowingRequest(client, context.Add($"{id}"));
+        public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
 
-    public interface UnauthedFollowingRequest
+    public class FollowersRequest
     {
-        Task<User> Get();
-    }
-
-    public class FollowingRequest : UnauthedFollowingRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FollowingRequest(SoundCloudHttpClient client, SearchContext context)
+        public FollowersRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("followers");
         }
 
-        public Task<User> Get() => client.Fetch<User>(context);
+        public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
+
+        public FollowerRequest this[int id] => new FollowerRequest(context, id);
     }
 
-    public interface UnauthedFollowersRequest
+    public class FollowerRequest
     {
-        Task<IEnumerable<User>> Get();
-        UnauthedFollowerRequest this[int id] { get; }
-    }
-
-    public class FollowersRequest : UnauthedFollowersRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FollowersRequest(SoundCloudHttpClient client, SearchContext context)
+        public FollowerRequest(SearchContext context, int id)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add(id);
         }
 
-        public Task<IEnumerable<User>> Get() => client.FetchMany<User>(context);
-
-        public UnauthedFollowerRequest this[int id] => new FollowerRequest(client, context.Add($"{id}"));
+        public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
-
-    public interface UnauthedFollowerRequest
+    
+    public class CommentsRequest
     {
-        Task<User> Get();
-    }
-
-    public class FollowerRequest : UnauthedFollowerRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FollowerRequest(SoundCloudHttpClient client, SearchContext context)
+        public CommentsRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("comments");
         }
 
-        public Task<User> Get() => client.Fetch<User>(context);
+        public RestRequestMany<Comment> Get() => new RestRequestMany<Comment>(context);
     }
-
-    public interface UnauthedCommentsRequest
+    
+    public class FavoritesRequest
     {
-        Task<IEnumerable<Comment>> Get();
-    }
-
-    public class CommentsRequest : UnauthedCommentsRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public CommentsRequest(SoundCloudHttpClient client, SearchContext context)
+        public FavoritesRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("favorites");
         }
 
-        public Task<IEnumerable<Comment>> Get() => client.FetchMany<Comment>(context);
+        public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
+
+        public FavoriteRequest this[int id] => new FavoriteRequest(context,id);
     }
 
-    public interface UnauthedFavoritesRequest
+    public class FavoriteRequest
     {
-        Task<IEnumerable<Track>> Get();
-        UnauthedFavoriteRequest this[int id] { get; }
-    }
-
-    public class FavoritesRequest : UnauthedFavoritesRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FavoritesRequest(SoundCloudHttpClient client, SearchContext context)
+        public FavoriteRequest(SearchContext context, int id)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add(id);
         }
 
-        public Task<IEnumerable<Track>> Get() => client.FetchMany<Track>(context);
-
-        public UnauthedFavoriteRequest this[int id] => new FavoriteRequest(client, context.Add($"{id}"));
+        public RestRequest<Track> Get() => RestRequest<Track>.Get(context);
     }
 
-    public interface UnauthedFavoriteRequest
+    public class WebProfilesRequest 
     {
-        Task<Track> Get();
-    }
-
-    public class FavoriteRequest : UnauthedFavoriteRequest
-    {
-        private readonly SoundCloudHttpClient client;
         private readonly SearchContext context;
 
-        public FavoriteRequest(SoundCloudHttpClient client, SearchContext context)
+        public WebProfilesRequest(SearchContext context)
         {
-            this.client = client;
-            this.context = context;
+            this.context = context.Add("web-profiles");
         }
 
-        public Task<Track> Get() => client.Fetch<Track>(context);
-    }
-
-    public interface UnauthedWebProfilesRequest
-    {
-        Task<IEnumerable<WebProfile>> Get();
-    }
-
-    public class WebProfilesRequest : UnauthedWebProfilesRequest
-    {
-        private readonly SoundCloudHttpClient client;
-        private readonly SearchContext context;
-
-        public WebProfilesRequest(SoundCloudHttpClient client, SearchContext context)
-        {
-            this.client = client;
-            this.context = context;
-        }
-
-        public Task<IEnumerable<WebProfile>> Get() => client.FetchMany<WebProfile>(context);
+        public RestRequestMany<WebProfile> Get() => new RestRequestMany<WebProfile>(context);
     }
 }

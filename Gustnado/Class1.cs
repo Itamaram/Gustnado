@@ -152,21 +152,4 @@ namespace Gustnado
         [JsonProperty("next_href")]
         public string NextHref { get; set; }
     }
-
-    public interface UnauthedApiClient
-    {
-        UnauthedUsersRequest Users { get; }
-    }
-
-    public class ApiClient : UnauthedApiClient
-    {
-        private readonly SoundCloudHttpClient client;
-
-        public ApiClient(SoundCloudHttpClient client)
-        {
-            this.client = client;
-        }
-
-        public UnauthedUsersRequest Users => new UsersRequest(client, new SearchContext("users"));
-    }
 }
