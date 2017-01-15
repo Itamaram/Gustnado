@@ -2,14 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using Bearded.Monads;
 using Gustnado.Extensions;
-using Gustnado.Objects;
 using Gustnado.Requests.Tracks;
-using Gustnado.Requests.Users;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -24,7 +20,7 @@ namespace Gustnado
 
         public static IEnumerable<KeyValuePair<string, string>> AsParameter(this Option<string> value, string key)
         {
-            if(value.IsSome)
+            if (value.IsSome)
                 yield return new KeyValuePair<string, string>(key, value.ForceValue());
         }
 
@@ -32,7 +28,7 @@ namespace Gustnado
         {
             B b;
             return d.TryGetValue(key, out b) ? b : Option<B>.None;
-        } 
+        }
     }
 
     public static class ObjectExtensions
@@ -96,20 +92,35 @@ namespace Gustnado
 
         public IEnumerable<T> Execute<T>(RestRequestMany<T> request, int limit = 50)
         {
+            return GetPages(request, limit).SelectMany(p => p.Collection);
+        }
+
+        private IEnumerable<PaginationResult<T>> GetPages<T>(RestRequestMany<T> request, int limit)
+        {
             var page = request.AddQueryParameter("client_id", clientId)
                 .AddQueryParameter("linked_partitioning", "1")
                 .AddQueryParameter("limit", limit.ToString())
                 .Map(r => http.Execute<PaginationResult<T>>(r).Data);
-            
-            foreach (var item in page.Collection)
-                yield return item;
+
+            yield return page;
 
             while (page.NextHref != null)
             {
-                page = http.Execute<PaginationResult<T>>(new RestRequest(page.NextHref)).Data;
-                foreach (var item in page.Collection)
-                    yield return item;
+                var next = new Uri(page.NextHref).PathAndQuery;
+
+                page = http.Execute<PaginationResult<T>>(new RestRequest(next)).Data;
+                
+                yield return page;
             }
+        }
+    }
+
+    public class GustnadoRestClient : RestClient
+    {
+        public GustnadoRestClient()
+            : base(Constants.ApiEndpoint)
+        {
+            AddHandler("application/json", CustomSerializer.Default);
         }
     }
 
@@ -147,7 +158,7 @@ namespace Gustnado
     public class PaginationResult<T>
     {
         [JsonProperty("collection")]
-        public List<T> Collection { get; set; } 
+        public List<T> Collection { get; set; }
 
         [JsonProperty("next_href")]
         public string NextHref { get; set; }
