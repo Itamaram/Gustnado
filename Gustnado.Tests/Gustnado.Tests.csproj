@@ -65,6 +65,7 @@
     <Compile Include="Converters\DateTimeFormatterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryStringFormatterTests.cs" />
+    <Compile Include="SecretConstants.cs" />
     <Compile Include="UnauthedApiClientTests.cs" />
   </ItemGroup>
   <ItemGroup>

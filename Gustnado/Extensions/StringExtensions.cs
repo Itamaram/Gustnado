@@ -19,6 +19,11 @@ namespace Gustnado.Extensions
         {
             return items.Join("/");
         }
+
+        public static string PathAndQuery(this string url)
+        {
+            return new Uri(url).PathAndQuery;
+        }
     }
 
     public static class EnumerableExtensions
@@ -71,6 +76,12 @@ namespace Gustnado.Extensions
         public static T AddQueryParameters<T>(this T request, IEnumerable<KeyValuePair<string, string>> parameters) where T: IRestRequest
         {
             return parameters.Aggregate(request, (r, p) => r.AddQueryParameter(p));
+        }
+
+        public static T AddQueryParameter<T>(this T request, string key, Option<string> value) where T : IRestRequest
+        {
+            value.WhenSome(v => request.AddQueryParameter(key, v));
+            return request;
         }
 
         public static Request AddToRequestBody<Request, T>(this Request request, T item) where Request: IRestRequest

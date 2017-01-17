@@ -5,6 +5,7 @@ using RestSharp;
 
 namespace Gustnado.Requests.Tracks
 {
+    //todo override json serializer?
     public class RestRequest<T> : RestRequest
     {
         public RestRequest(SearchContext context, Method method)
@@ -107,6 +108,7 @@ namespace Gustnado.Requests.Tracks
         public RestRequest<Comment> Post(Comment comment)
         {
             return RestRequest<Comment>.Post(context)
+                //todo pretty sure this is wrong, Should be sending as json, not as request body
                 .AddSoundCloudObject(comment);
         }
 

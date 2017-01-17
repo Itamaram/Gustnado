@@ -14,7 +14,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>123</example>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// timestamp of creation
@@ -28,7 +28,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>343</example>
         [JsonProperty("user_id")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         /// mini user representation of the owner
@@ -112,7 +112,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>1203400</example>
         [JsonProperty("duration")]
-        public long Duration { get; set; }
+        public long? Duration { get; set; }
 
         /// <summary>
         /// genre
@@ -189,14 +189,14 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"finished"</example>
         [JsonProperty("state")]
-        public EncodingState State { get; set; }
+        public EncodingState? State { get; set; }
 
         /// <summary>
         /// creative common license
         /// </summary>
         /// <example>"no-rights-reserved"</example>
         [JsonProperty("license")]
-        public License License { get; set; }
+        public License? License { get; set; }
 
         /// <summary>
         /// track type
@@ -245,7 +245,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>true</example>
         [JsonProperty("commentable")]
-        public bool Commentable { get; set; }
+        public bool? Commentable { get; set; }
 
         /// <summary>
         /// track ISRC
@@ -266,28 +266,28 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>12</example>
         [JsonProperty("comment_count")]
-        public int CommentCount { get; set; }
+        public int? CommentCount { get; set; }
 
         /// <summary>
         /// track download count
         /// </summary>
         /// <example>45</example>
         [JsonProperty("download_count")]
-        public int DownloadCount { get; set; }
+        public int? DownloadCount { get; set; }
 
         /// <summary>
         /// track play count
         /// </summary>
         /// <example>435</example>
         [JsonProperty("playback_count")]
-        public int PlaybackCount { get; set; }
+        public int? PlaybackCount { get; set; }
 
         /// <summary>
         /// track favoriting count
         /// </summary>
         /// <example>6</example>
         [JsonProperty("favoritings_count")]
-        public int FavoritingsCount { get; set; }
+        public int? FavoritingsCount { get; set; }
 
         /// <summary>
         /// file format of the original file
@@ -301,7 +301,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>10211857</example>
         [JsonProperty("original_content_size")]
-        public int OriginalContentSize { get; set; }
+        public int? OriginalContentSize { get; set; }
 
         /// <summary>
         /// binary data of the audio file
@@ -316,14 +316,15 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>(only for uploading)</example>
         [JsonProperty("artwork_data")]
-        public object ArtworkData { get; set; }
+        [JsonConverter(typeof(AddToRequestBodyAsFile))]
+        public string ArtworkData { get; set; }
 
         /// <summary>
         /// track favorite of current user (boolean, authenticated requests only)
         /// </summary>
         /// <example>1</example>
         [JsonProperty("user_favorite")]
-        [JsonConverter(typeof(IntToBoolConverter))]
+        //[JsonConverter(typeof(IntToBoolConverter))]
         public bool? UserFavorite { get; set; }
     }
 }

@@ -360,7 +360,7 @@ namespace Gustnado.Requests.Tracks
         private void Write(object obj)
         {
             obj.AsOption()
-                .WhenSome(value => request.AddParameter(key, value, ParameterType.RequestBody));
+                .WhenSome(value => request.AddParameter(key, value));
         }
         public override void WriteValue(string value)
         {

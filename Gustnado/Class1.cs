@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using Bearded.Monads;
 using Gustnado.Extensions;
+using Gustnado.Objects;
+using Gustnado.Requests;
 using Gustnado.Requests.Tracks;
 using Newtonsoft.Json;
 using RestSharp;
@@ -67,26 +69,53 @@ namespace Gustnado
         public static object Invoke(this MethodBase m, object o) => m.Invoke(o, new object[0]);
     }
 
+    public class SoundCloudHttpClientFactory
+    {
 
+    }
 
     //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
+    //todo should this be abstract?
     public class SoundCloudHttpClient
     {
         private readonly string clientId;
         private readonly IRestClient http;
+        private readonly Option<string> auth = Option<string>.None;
 
-        //todo Ensure client is fed the deserialiser
         public SoundCloudHttpClient(string clientId, IRestClient http)
         {
             this.clientId = clientId;
             this.http = http;
         }
 
+        public SoundCloudHttpClient(string auth, string clientId, IRestClient http)
+            : this(clientId, http)
+        {
+            this.auth = auth;
+        }
+
+        public SoundCloudHttpClient(string username, string password, string clientId, string secret, IRestClient http)
+            : this(clientId, http)
+        {
+            var request = SoundCloudApi.OAuth2.Post(new OAuthRequest
+            {
+                ClientId = clientId,
+                ClientSecret = secret,
+                GrantType = GrantType.Password,
+                Username = username,
+                Password = password,
+                State = "McTestface"
+            });
+
+            var response = http.Execute<OAuthResponse>(request);
+            auth = response.Data.AccessToken;
+        }
+
         public T Execute<T>(RestRequest<T> request) where T : new()
         {
-            //todo Add auth if authed? Or is that a different class?
             //todo error handling :/
             return request.AddQueryParameter("client_id", clientId)
+                .AddQueryParameter("oauth_token", auth)
                 .Map(r => http.Execute<T>(r).Data);
         }
 
@@ -98,6 +127,7 @@ namespace Gustnado
         private IEnumerable<PaginationResult<T>> GetPages<T>(RestRequestMany<T> request, int limit)
         {
             var page = request.AddQueryParameter("client_id", clientId)
+                .AddQueryParameter("oauth_token", auth)
                 .AddQueryParameter("linked_partitioning", "1")
                 .AddQueryParameter("limit", limit.ToString())
                 .Map(r => http.Execute<PaginationResult<T>>(r).Data);
@@ -106,10 +136,8 @@ namespace Gustnado
 
             while (page.NextHref != null)
             {
-                var next = new Uri(page.NextHref).PathAndQuery;
+                page = http.Execute<PaginationResult<T>>(new RestRequest(page.NextHref.PathAndQuery())).Data;
 
-                page = http.Execute<PaginationResult<T>>(new RestRequest(next)).Data;
-                
                 yield return page;
             }
         }
@@ -152,7 +180,7 @@ namespace Gustnado
 
     public static class Constants
     {
-        public static string ApiEndpoint = "http://api.soundcloud.com";
+        public static string ApiEndpoint = "https://api.soundcloud.com";
     }
 
     public class PaginationResult<T>
