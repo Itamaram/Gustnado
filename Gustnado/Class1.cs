@@ -79,23 +79,24 @@ namespace Gustnado
     public class SoundCloudHttpClient
     {
         private readonly string clientId;
+        private readonly string secret;
         private readonly IRestClient http;
-        private readonly Option<string> auth = Option<string>.None;
+        private Option<string> oauth = Option<string>.None;
 
-        public SoundCloudHttpClient(string clientId, IRestClient http)
+        public SoundCloudHttpClient(string clientId, string secret, IRestClient http)
         {
             this.clientId = clientId;
+            this.secret = secret;
             this.http = http;
         }
 
-        public SoundCloudHttpClient(string auth, string clientId, IRestClient http)
-            : this(clientId, http)
+        public SoundCloudHttpClient Authenticate(string token)
         {
-            this.auth = auth;
+            oauth = token;
+            return this;
         }
 
-        public SoundCloudHttpClient(string username, string password, string clientId, string secret, IRestClient http)
-            : this(clientId, http)
+        public SoundCloudHttpClient Authenticate(string username, string password)
         {
             var request = SoundCloudApi.OAuth2.Post(new OAuthRequest
             {
@@ -104,18 +105,18 @@ namespace Gustnado
                 GrantType = GrantType.Password,
                 Username = username,
                 Password = password,
-                State = "McTestface"
             });
 
-            var response = http.Execute<OAuthResponse>(request);
-            auth = response.Data.AccessToken;
+            oauth = http.Execute<OAuthResponse>(request).Data.AccessToken;
+
+            return this;
         }
 
         public T Execute<T>(RestRequest<T> request) where T : new()
         {
             //todo error handling :/
             return request.AddQueryParameter("client_id", clientId)
-                .AddQueryParameter("oauth_token", auth)
+                .AddQueryParameter("oauth_token", oauth)
                 .Map(r => http.Execute<T>(r).Data);
         }
 
@@ -127,7 +128,7 @@ namespace Gustnado
         private IEnumerable<PaginationResult<T>> GetPages<T>(RestRequestMany<T> request, int limit)
         {
             var page = request.AddQueryParameter("client_id", clientId)
-                .AddQueryParameter("oauth_token", auth)
+                .AddQueryParameter("oauth_token", oauth)
                 .AddQueryParameter("linked_partitioning", "1")
                 .AddQueryParameter("limit", limit.ToString())
                 .Map(r => http.Execute<PaginationResult<T>>(r).Data);
