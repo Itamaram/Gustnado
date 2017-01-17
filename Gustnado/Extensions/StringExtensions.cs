@@ -94,5 +94,13 @@ namespace Gustnado.Extensions
 
             return request;
         }
+
+        public static Request AddJsonToRequestBody<Request, T>(this Request request, T item) where Request : IRestRequest
+        {
+            request.RequestFormat = DataFormat.Json;
+            request.JsonSerializer = CustomSerializer.Default;
+            request.AddJsonBody(item);
+            return request;
+        }
     }
 }
