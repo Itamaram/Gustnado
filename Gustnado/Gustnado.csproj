@@ -52,6 +52,7 @@
     <Compile Include="Converters\SoundCloudDateTime.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
     <Compile Include="Converters\IntToBoolConverter.cs" />
+    <Compile Include="Converters\TrackCompactor.cs" />
     <Compile Include="Enums\EncodingState.cs" />
     <Compile Include="Enums\PlaylistType.cs" />
     <Compile Include="Enums\TrackType.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Objects\WebProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requests\OAuth\OAuthEndpoint.cs" />
+    <Compile Include="Requests\Playlists\PlaylistsEndpoint.cs" />
     <Compile Include="Requests\SoundCloudApi.cs" />
     <Compile Include="Requests\Tracks\Second.cs" />
     <Compile Include="Requests\Tracks\Tracks.cs" />

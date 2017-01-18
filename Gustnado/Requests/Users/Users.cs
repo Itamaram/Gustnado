@@ -60,7 +60,7 @@ namespace Gustnado.Requests.Users
             this.context = context.Add("playlists");
         }
 
-        public RestRequestMany<PlayList> Get() => new RestRequestMany<PlayList>(context);
+        public RestRequestMany<Playlist> Get() => new RestRequestMany<Playlist>(context);
     }
 
     public class FollowingsRequest

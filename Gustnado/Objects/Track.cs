@@ -22,7 +22,7 @@ namespace Gustnado.Objects
         /// <example>2009/08/13 18:30:10 +0000</example>
         [JsonProperty("created_at")]
         [JsonConverter(typeof(SoundCloudDateTime))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         /// <summary>
         /// user-id of the owner
         /// </summary>
@@ -175,14 +175,14 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>true</example>
         [JsonProperty("streamable")]
-        public bool Streamable { get; set; }
+        public bool? Streamable { get; set; }
 
         /// <summary>
         /// downloadable (boolean)
         /// </summary>
         /// <example>true</example>
         [JsonProperty("downloadable")]
-        public bool Downloadable { get; set; }
+        public bool? Downloadable { get; set; }
 
         /// <summary>
         /// encoding state

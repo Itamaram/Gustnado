@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Gustnado.Converters;
 using Gustnado.Enums;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects
 {
-    public class PlayList
+    public class Playlist
     {
         /// <summary>
         /// integer ID
@@ -197,5 +198,10 @@ namespace Gustnado.Objects
         /// <example>"recording"</example>
         [JsonProperty("playlist_type")]
         public PlaylistType? PlaylistType { get; set; }
+
+        //todo tell the soundcloud api documentation team to get their head in the game
+        [JsonProperty("tracks")]
+        [JsonConverter(typeof(TrackCompactor))]
+        public List<Track> Tracks { get; set; }
     }
 }
