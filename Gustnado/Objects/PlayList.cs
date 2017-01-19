@@ -13,7 +13,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>123</example>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// timestamp of creation
@@ -21,14 +21,14 @@ namespace Gustnado.Objects
         /// <example>"2009/08/13 18:30:10 +0000"</example>
         [JsonProperty("created_at")]
         [JsonConverter(typeof(SoundCloudDateTime))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// user-id of the owner
         /// </summary>
         /// <example>343</example>
         [JsonProperty("user_id")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         /// mini user representation of the owner
@@ -112,7 +112,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>1203400</example>
         [JsonProperty("duration")]
-        public long Duration { get; set; }
+        public long? Duration { get; set; }
 
         /// <summary>
         /// genre

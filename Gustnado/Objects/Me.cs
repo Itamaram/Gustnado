@@ -16,20 +16,20 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>34</example>
         [JsonProperty("private_tracks_count")]
-        public int PrivateTracksCount { get; set; }
+        public int? PrivateTracksCount { get; set; }
 
         /// <summary>
         /// number of private playlists
         /// </summary>
         /// <example>6</example>
         [JsonProperty("private_playlists_count")]
-        public int PrivatePlaylistsCount { get; set; }
+        public int? PrivatePlaylistsCount { get; set; }
 
         /// <summary>
         /// boolean if email is confirmed
         /// </summary>
         /// <example>true</example>
         [JsonProperty("primary_email_confirmed")]
-        public bool PrimaryEmailConfirmed { get; set; }
+        public bool? PrimaryEmailConfirmed { get; set; }
     }
 }

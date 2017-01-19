@@ -66,6 +66,7 @@
     <Compile Include="Converters\DateTimeFormatterTests.cs" />
     <Compile Include="Converters\EnumConverterTests.cs" />
     <Compile Include="Converters\TrackCompactorTests.cs" />
+    <Compile Include="Objects\SerialisationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecretConstants.cs" />
   </ItemGroup>

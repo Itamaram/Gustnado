@@ -56,13 +56,13 @@
     <Compile Include="Converters\IntToBoolConverter.cs" />
     <Compile Include="Converters\TrackCompactor.cs" />
     <Compile Include="Enums\EncodingState.cs" />
+    <Compile Include="Enums\License.cs" />
     <Compile Include="Enums\PlaylistType.cs" />
     <Compile Include="Enums\TrackType.cs" />
     <Compile Include="Enums\TrackVisibility.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Objects\App.cs" />
     <Compile Include="Objects\Comment.cs" />
-    <Compile Include="Objects\License.cs" />
     <Compile Include="Objects\Me.cs" />
     <Compile Include="Objects\OAuth.cs" />
     <Compile Include="Objects\PlayList.cs" />

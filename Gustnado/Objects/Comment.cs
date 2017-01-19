@@ -11,7 +11,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>123</example>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// API resource URL
@@ -26,7 +26,7 @@ namespace Gustnado.Objects
         /// <example>"2009/08/13 18:30:10 +0000"</example>
         [JsonProperty("created_at")]
         [JsonConverter(typeof(SoundCloudDateTime))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// HTML comment body
@@ -40,14 +40,14 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>55593</example>
         [JsonProperty("timestamp")]
-        public long Timestamp { get; set; }
+        public long? Timestamp { get; set; }
 
         /// <summary>
         /// user id of the owner
         /// </summary>
         /// <example>343</example>
         [JsonProperty("user_id")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         /// mini user representation of the owner
@@ -61,6 +61,6 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>54</example>
         [JsonProperty("track_id")]
-        public int TrackId { get; set; }
+        public int? TrackId { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using Gustnado.Serialisation;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects
@@ -9,7 +10,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>123</example>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// permalink of the resource
@@ -107,48 +108,49 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>true</example>
         [JsonProperty("online")]
-        public bool Online { get; set; }
+        public bool? Online { get; set; }
 
         /// <summary>
         /// number of public tracks
         /// </summary>
         /// <example>4</example>
         [JsonProperty("track_count")]
-        public int TrackCount { get; set; }
+        public int? TrackCount { get; set; }
 
         /// <summary>
         /// number of public playlists
         /// </summary>
         /// <example>5</example>
         [JsonProperty("playlist_count")]
-        public int PlaylistCount { get; set; }
+        public int? PlaylistCount { get; set; }
 
         /// <summary>
         /// number of followers
         /// </summary>
         /// <example>54</example>
         [JsonProperty("followers_count")]
-        public int FollowersCount { get; set; }
+        public int? FollowersCount { get; set; }
 
         /// <summary>
         /// number of followed users
         /// </summary>
         /// <example>75</example>
         [JsonProperty("followings_count")]
-        public int FollowingsCount { get; set; }
+        public int? FollowingsCount { get; set; }
 
         /// <summary>
         /// number of favorited public tracks
         /// </summary>
         /// <example>7</example>
         [JsonProperty("public_favorites_count")]
-        public int PublicFavoritesCount { get; set; }
+        public int? PublicFavoritesCount { get; set; }
 
         /// <summary>
         /// binary data of user avatar
         /// </summary>
         /// <example>(only for uploading)</example>
         [JsonProperty("avatar_data")]
-        public object AvatarData { get; set; }
+        [JsonConverter(typeof(AddToRequestBodyAsFile))]
+        public string AvatarData { get; set; }
     }
 }

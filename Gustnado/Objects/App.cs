@@ -9,7 +9,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>123</example>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// API resource URL

@@ -31,7 +31,7 @@ namespace Gustnado.Objects
         ///</summary>
         /// <example></example>
         [JsonProperty("grant_type")]
-        public GrantType GrantType { get; set; }
+        public GrantType? GrantType { get; set; }
 
         /// <summary>
         ///The authorization code obtained when user is sent to redirect_uri

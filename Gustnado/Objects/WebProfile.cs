@@ -7,7 +7,7 @@ namespace Gustnado.Objects
     public class WebProfile
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [JsonProperty("kind")]
         public string Kind { get; set; }
@@ -26,6 +26,6 @@ namespace Gustnado.Objects
 
         [JsonProperty("created_at")]
         [JsonConverter(typeof(SoundCloudDateTime))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }
