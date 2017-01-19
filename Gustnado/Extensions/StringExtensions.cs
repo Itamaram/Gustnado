@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bearded.Monads;
+using Gustnado.Attributes;
 using Gustnado.Requests.Tracks;
 using Gustnado.Serialisation;
 using Newtonsoft.Json;

@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Gustnado.Converters;
+using Gustnado.Enums;
 using Gustnado.Extensions;
 using Gustnado.Objects;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Gustnado.Requests.Tracks
@@ -184,5 +188,92 @@ namespace Gustnado.Requests.Tracks
     public class SecretTokenContainer
     {
         public string SecretToken { get; set; }
+    }
+
+    public class TracksRequestFilter
+    {
+        /// <summary>
+        /// a string to search for (see search documentation)
+        /// </summary>
+        [JsonProperty("q")]
+        public string Q { get; set; }
+
+        /// <summary>
+        /// a comma separated list of tags
+        /// </summary>
+        [JsonProperty("tags")]
+        [JsonConverter(typeof(CommaSeparatedList))]
+        public List<string> Tags { get; set; }
+
+        /// <summary>
+        /// (all,public,private)
+        /// </summary>
+        [JsonProperty("filter")]
+        public TrackVisibility? Filter { get; set; }
+
+        /// <summary>
+        /// Filter on license. (see license attribute)
+        /// </summary>
+        [JsonProperty("license")]
+        public License? License { get; set; }
+
+        /// <summary>
+        /// return tracks with at least this bpm value
+        ///</summary>
+        [JsonProperty("bpm[from]")]
+        public int? BpmFrom { get; set; }
+
+        /// <summary>
+        /// return tracks with at most this bpm value
+        ///</summary>
+        [JsonProperty("bpm[to]")]
+        public int? BpmTo { get; set; }
+
+        /// <summary>
+        /// return tracks with at least this duration (in millis)
+        ///</summary>
+        [JsonProperty("duration[from]")]
+        public int? DurationFrom { get; set; }
+
+        /// <summary>
+        /// return tracks with at most this duration (in millis)
+        ///</summary>
+        [JsonProperty("duration[to]")]
+        public int? DurationTo { get; set; }
+
+        /// <summary>
+        /// (yyyy-mm-dd hh:mm:ss) return tracks created at this date or later
+        ///</summary>
+        [JsonProperty("created_at[from]")]
+        [JsonConverter(typeof(SoundCloudDateTime))]
+        public DateTime? CreateAtFrom { get; set; }
+
+        /// <summary>
+        /// (yyyy-mm-dd hh:mm:ss) return tracks created at this date or earlier
+        ///</summary>
+        [JsonProperty("created_at[to]")]
+        [JsonConverter(typeof(SoundCloudDateTime))]
+        public DateTime? CreatedAtTo { get; set; }
+
+        /// <summary>
+        /// a comma separated list of track ids to filter on
+        ///</summary>
+        [JsonProperty("ids")]
+        [JsonConverter(typeof(CommaSeparatedList))]
+        public List<int> Ids { get; set; }
+
+        /// <summary>
+        /// a comma separated list of genres
+        ///</summary>
+        [JsonProperty("genres")]
+        [JsonConverter(typeof(CommaSeparatedList))]
+        public List<string> Genres { get; set; }
+
+        /// <summary>
+        /// a comma separated list of types
+        ///</summary>
+        [JsonProperty("types")]
+        [JsonConverter(typeof(CommaSeparatedList))]
+        public List<TrackType> Types { get; set; }
     }
 }

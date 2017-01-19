@@ -48,7 +48,9 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\RequestBodyKeyFormatAttribute.cs" />
     <Compile Include="Class1.cs" />
+    <Compile Include="Converters\CommaSeparatedList.cs" />
     <Compile Include="Converters\SoundCloudDateTime.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
     <Compile Include="Converters\IntToBoolConverter.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Enums\EncodingState.cs" />
     <Compile Include="Enums\PlaylistType.cs" />
     <Compile Include="Enums\TrackType.cs" />
+    <Compile Include="Enums\TrackVisibility.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Objects\App.cs" />
     <Compile Include="Objects\Comment.cs" />
@@ -71,7 +74,6 @@
     <Compile Include="Requests\Playlists\PlaylistsEndpoint.cs" />
     <Compile Include="Requests\SoundCloudApi.cs" />
     <Compile Include="Requests\Tracks\Second.cs" />
-    <Compile Include="Requests\Tracks\Tracks.cs" />
     <Compile Include="Requests\Users\MeRequest.cs" />
     <Compile Include="Requests\Users\Users.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
