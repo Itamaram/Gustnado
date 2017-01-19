@@ -15,4 +15,6 @@ namespace Gustnado.Endpoints.OAuth
 
         //todo convenience methods for different auth types
     }
+
+    //todo connect endpoint
 }

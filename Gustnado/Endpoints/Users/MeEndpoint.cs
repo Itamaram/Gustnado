@@ -1,5 +1,7 @@
+using Gustnado.Extensions;
 using Gustnado.Objects;
 using Gustnado.RestSharp;
+using Newtonsoft.Json;
 
 namespace Gustnado.Endpoints.Users
 {
@@ -18,6 +20,52 @@ namespace Gustnado.Endpoints.Users
         public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint(context);
 
         //todo activities
-        //todo connections
+    }
+
+    public class ConnectionsEndpoint
+    {
+        private readonly SearchContext context;
+
+        public ConnectionsEndpoint(SearchContext context)
+        {
+            this.context = context.Add("connections");
+        }
+
+        public RestRequestMany<Connection> Get() => RestRequestMany<Connection>.Get(context);
+
+        public RestRequest<NewConnectionResponse> Post(NewConnectionRequest request)
+        {
+            return RestRequest<NewConnectionResponse>.Post(context)
+                .WriteToRequest(request);
+        }
+
+        public ConnectionEndpoint this[int id] => new ConnectionEndpoint(context, id);
+    }
+
+    public class ConnectionEndpoint
+    {
+        private readonly SearchContext context;
+
+        public ConnectionEndpoint(SearchContext context, int id)
+        {
+            this.context = context.Add(id);
+        }
+
+        public RestRequest<Connection> Get() => RestRequest<Connection>.Get(context); 
+    }
+
+    public class NewConnectionRequest
+    {
+        [JsonProperty("service")]
+        public ConnectionService Service { get; set; }
+
+        [JsonProperty("redirect_uri")]
+        public string RedirectUri { get; set; }
+    }
+
+    public class NewConnectionResponse
+    {
+        [JsonProperty("authorize_url")]
+        public string AuthorizeUrl { get; set; }
     }
 }
