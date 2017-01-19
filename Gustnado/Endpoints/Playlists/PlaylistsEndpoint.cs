@@ -1,10 +1,10 @@
 ﻿using Gustnado.Converters;
 using Gustnado.Extensions;
 using Gustnado.Objects;
-using Gustnado.Requests.Tracks;
+using Gustnado.RestSharp;
 using Newtonsoft.Json;
 
-namespace Gustnado.Requests.Playlists
+namespace Gustnado.Endpoints.Playlists
 {
     public class PlaylistsEndpoint
     {

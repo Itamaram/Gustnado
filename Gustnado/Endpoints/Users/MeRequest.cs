@@ -1,7 +1,7 @@
 using Gustnado.Objects;
-using Gustnado.Requests.Tracks;
+using Gustnado.RestSharp;
 
-namespace Gustnado.Requests.Users
+namespace Gustnado.Endpoints.Users
 {
     public class MeRequest
     {

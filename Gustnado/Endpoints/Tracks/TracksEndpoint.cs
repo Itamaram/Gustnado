@@ -4,50 +4,12 @@ using Gustnado.Converters;
 using Gustnado.Enums;
 using Gustnado.Extensions;
 using Gustnado.Objects;
+using Gustnado.RestSharp;
 using Newtonsoft.Json;
-using RestSharp;
 
-namespace Gustnado.Requests.Tracks
+namespace Gustnado.Endpoints.Tracks
 {
-    //todo override json serializer?
-    public class RestRequest<T> : RestRequest
-    {
-        public RestRequest(SearchContext context, Method method)
-            : base(context.AsResource(), method) { }
-
-        public RestRequest<T> AddSoundCloudObject<A>(A item)
-        {
-            return this.WriteToRequest(item);
-        }
-
-        public static RestRequest<T> Get(SearchContext context)
-        {
-            return new RestRequest<T>(context, Method.GET);
-        }
-
-        public static RestRequest<T> Post(SearchContext context)
-        {
-            return new RestRequest<T>(context, Method.POST);
-        }
-
-        public static RestRequest<T> Put(SearchContext context)
-        {
-            return new RestRequest<T>(context, Method.PUT);
-        }
-
-        public static RestRequest<T> Delete(SearchContext context)
-        {
-            return new RestRequest<T>(context, Method.DELETE);
-        }
-    }
-
-    public class RestRequestMany<T> : RestRequest
-    {
-        public RestRequestMany(SearchContext context)
-            : base(context.AsResource(), Method.GET) { }
-    }
-
-    public class TracksRequest
+    public class TracksEndpoint
     {
         private static readonly SearchContext context = new SearchContext("tracks");
 
@@ -68,14 +30,14 @@ namespace Gustnado.Requests.Tracks
                 .AddSoundCloudObject(track);
         }
 
-        public TrackRequest this[int id] => new TrackRequest(context, id);
+        public TrackEndpoint this[int id] => new TrackEndpoint(context, id);
     }
 
-    public class TrackRequest
+    public class TrackEndpoint
     {
         private readonly SearchContext context;
 
-        public TrackRequest(SearchContext context, int id)
+        public TrackEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -90,16 +52,16 @@ namespace Gustnado.Requests.Tracks
 
         public RestRequest<object> Delete() => RestRequest<object>.Delete(context);
 
-        public TrackCommentsRequest Comments => new TrackCommentsRequest(context);
-        public TrackFavoritersRequest Favoriters => new TrackFavoritersRequest(context);
-        public TrackSecretTokenRequest SecretToken => new TrackSecretTokenRequest(context);
+        public TrackCommentsEndpoint Comments => new TrackCommentsEndpoint(context);
+        public TrackFavoritersEndpoint Favoriters => new TrackFavoritersEndpoint(context);
+        public TrackSecretTokenEndpoint SecretToken => new TrackSecretTokenEndpoint(context);
     }
 
-    public class TrackCommentsRequest
+    public class TrackCommentsEndpoint
     {
         private readonly SearchContext context;
 
-        public TrackCommentsRequest(SearchContext context)
+        public TrackCommentsEndpoint(SearchContext context)
         {
             this.context = context.Add("comments");
         }
@@ -116,14 +78,14 @@ namespace Gustnado.Requests.Tracks
                 .AddSoundCloudObject(comment);
         }
 
-        public TrackCommentRequest this[int id] => new TrackCommentRequest(context, id);
+        public TrackCommentEndpoint this[int id] => new TrackCommentEndpoint(context, id);
     }
 
-    public class TrackCommentRequest
+    public class TrackCommentEndpoint
     {
         private readonly SearchContext context;
 
-        public TrackCommentRequest(SearchContext context, int id)
+        public TrackCommentEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -137,25 +99,25 @@ namespace Gustnado.Requests.Tracks
         }
     }
 
-    public class TrackFavoritersRequest
+    public class TrackFavoritersEndpoint
     {
         private readonly SearchContext context;
 
-        public TrackFavoritersRequest(SearchContext context)
+        public TrackFavoritersEndpoint(SearchContext context)
         {
             this.context = context.Add("favoriters");
         }
 
         public RestRequest<IEnumerable<User>> Get() => RestRequest<IEnumerable<User>>.Get(context);
 
-        public TrackFavoriterRequest this[int id] => new TrackFavoriterRequest(context, id);
+        public TrackFavoriterEndpoint this[int id] => new TrackFavoriterEndpoint(context, id);
     }
 
-    public class TrackFavoriterRequest
+    public class TrackFavoriterEndpoint
     {
         private readonly SearchContext context;
 
-        public TrackFavoriterRequest(SearchContext context, int id)
+        public TrackFavoriterEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -163,11 +125,11 @@ namespace Gustnado.Requests.Tracks
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
 
-    public class TrackSecretTokenRequest
+    public class TrackSecretTokenEndpoint
     {
         private readonly SearchContext contexet;
 
-        public TrackSecretTokenRequest(SearchContext contexet)
+        public TrackSecretTokenEndpoint(SearchContext contexet)
         {
             this.contexet = contexet.Add("secret-token");
         }

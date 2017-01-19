@@ -1,7 +1,7 @@
 ﻿using Gustnado.Objects;
-using Gustnado.Requests.Tracks;
+using Gustnado.RestSharp;
 
-namespace Gustnado.Requests.OAuth
+namespace Gustnado.Endpoints.OAuth
 {
     public class OAuthEndpoint
     {
