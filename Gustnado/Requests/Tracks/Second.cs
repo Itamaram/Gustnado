@@ -13,7 +13,7 @@ namespace Gustnado.Requests.Tracks
 
         public RestRequest<T> AddSoundCloudObject<A>(A item)
         {
-            return this.AddToRequestBody(item);
+            return this.WriteToRequest(item);
         }
 
         public static RestRequest<T> Get(SearchContext context)
@@ -55,7 +55,7 @@ namespace Gustnado.Requests.Tracks
         public RestRequestMany<Track> Get(TracksRequestFilter filter)
         {
             return new RestRequestMany<Track>(context)
-                .AddQueryParameters(QueryStringFormatter.FromObject(filter));
+                .WriteToQueryString(filter);
         }
 
         public RestRequest<Track> Post(Track track)

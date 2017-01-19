@@ -6,21 +6,21 @@ namespace Gustnado.Objects
     [JsonConverter(typeof(EnumConverter<License>))]
     public enum License
     {
-        [JsonValue("no-rights-reserved")]
+        [JsonProperty("no-rights-reserved")]
         NoRightsReserved,
-        [JsonValue("all-rights-reserved")]
+        [JsonProperty("all-rights-reserved")]
         AllRightsReserved,
-        [JsonValue("cc-by")]
+        [JsonProperty("cc-by")]
         Attribution,
-        [JsonValue("cc-by-nc")]
+        [JsonProperty("cc-by-nc")]
         AttributionNonCommercial,
-        [JsonValue("cc-by-nd")]
+        [JsonProperty("cc-by-nd")]
         AttributionNoDerivatives,
-        [JsonValue("cc-by-sa")]
+        [JsonProperty("cc-by-sa")]
         AttributionShareAlike,
-        [JsonValue("cc-by-nc-nd")]
+        [JsonProperty("cc-by-nc-nd")]
         AttributionNonCommercialNoDerivatives,
-        [JsonValue("cc-by-nc-sa")]
+        [JsonProperty("cc-by-nc-sa")]
         AttributionNonCommercialShareAlike
     }
 }

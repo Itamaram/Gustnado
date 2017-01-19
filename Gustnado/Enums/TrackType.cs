@@ -6,31 +6,31 @@ namespace Gustnado.Enums
     [JsonConverter(typeof(EnumConverter<TrackType>))]
     public enum TrackType
     {
-        [JsonValue("original")]
+        [JsonProperty("original")]
         Original,
-        [JsonValue("remix")]
+        [JsonProperty("remix")]
         Remix,
-        [JsonValue("live")]
+        [JsonProperty("live")]
         Live,
-        [JsonValue("recording")]
+        [JsonProperty("recording")]
         Recording,
-        [JsonValue("spoken")]
+        [JsonProperty("spoken")]
         Spoken,
-        [JsonValue("podcast")]
+        [JsonProperty("podcast")]
         Podcast,
-        [JsonValue("demo")]
+        [JsonProperty("demo")]
         Demo,
-        [JsonValue("in progress")]
+        [JsonProperty("in progress")]
         InProgress,
-        [JsonValue("stem")]
+        [JsonProperty("stem")]
         Stem,
-        [JsonValue("loop")]
+        [JsonProperty("loop")]
         Loop,
-        [JsonValue("sound effect")]
+        [JsonProperty("sound effect")]
         SoundEffect,
-        [JsonValue("sample")]
+        [JsonProperty("sample")]
         Sample,
-        [JsonValue("other")]
+        [JsonProperty("other")]
         Other
     }
 }

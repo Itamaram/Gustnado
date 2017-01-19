@@ -1,5 +1,4 @@
-﻿using Bearded.Monads;
-using Gustnado.Converters;
+﻿using Gustnado.Converters;
 using Gustnado.Extensions;
 using Gustnado.Objects;
 using Gustnado.Requests.Tracks;
@@ -11,14 +10,13 @@ namespace Gustnado.Requests.Playlists
     {
         private static readonly SearchContext context = new SearchContext("playlists");
 
-        public RestRequestMany<Playlist> Get(Option<PlaylistsFilters> filters)
+        public RestRequestMany<Playlist> Get(PlaylistsFilters filters)
         {
             return new RestRequestMany<Playlist>(context)
-                //todo deserialise object into query parameters
-                .AddQueryParameter(filters);
+                .WriteToQueryString(filters);
         }
 
-        public RestRequestMany<Playlist> Get() => Get(Option<PlaylistsFilters>.None);
+        public RestRequestMany<Playlist> Get() => new RestRequestMany<Playlist>(context);
 
         public RestRequest<Playlist> Put(Playlist playlist)
         {

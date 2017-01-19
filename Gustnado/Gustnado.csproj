@@ -75,6 +75,11 @@
     <Compile Include="Requests\Users\MeRequest.cs" />
     <Compile Include="Requests\Users\Users.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
+    <Compile Include="Serialisation\AddToRequestBodyAsFile.cs" />
+    <Compile Include="Serialisation\CustomSerializer.cs" />
+    <Compile Include="Serialisation\RequestQueryStringWriter.cs" />
+    <Compile Include="Serialisation\RequestWriter.cs" />
+    <Compile Include="Serialisation\SerialiserSettingsPresets.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

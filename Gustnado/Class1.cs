@@ -8,6 +8,7 @@ using Gustnado.Extensions;
 using Gustnado.Objects;
 using Gustnado.Requests;
 using Gustnado.Requests.Tracks;
+using Gustnado.Serialisation;
 using Newtonsoft.Json;
 using RestSharp;
 

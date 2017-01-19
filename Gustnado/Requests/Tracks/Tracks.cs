@@ -2,16 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Bearded.Monads;
 using Gustnado.Converters;
 using Gustnado.Enums;
 using Gustnado.Objects;
 using Newtonsoft.Json;
-using RestSharp;
-using RestSharp.Deserializers;
-using RestSharp.Serializers;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Gustnado.Requests.Tracks
 {
@@ -201,51 +198,71 @@ namespace Gustnado.Requests.Tracks
         public string Format(object o) => Format((T)o);
     }
 
-    public class CommaSeparatedList : ParameterFormatter<IEnumerable>
+    public class StringBuildingWriter : JsonWriter
     {
-        protected override string Format(IEnumerable t) => string.Join(",", t);
-    }
+        private readonly StringBuilder builder = new StringBuilder();
 
-    public class EnumFormatter<T> : ParameterFormatter<T>
-    {
-        protected override string Format(T t) => EnumJsonValueMap<T>.ToJson(t);
-    }
-
-    public class DateTimeFormatter : ParameterFormatter<DateTime>
-    {
-        protected override string Format(DateTime t) => t.ToString("yyyy-mm-dd HH:mm:ss");
-    }
-
-    public class CommaSeparatedEnum<T> : ParameterFormatter<List<T>>
-    {
-        protected override string Format(List<T> t) => string.Join(",", t.Select(EnumJsonValueMap<T>.ToJson));
-    }
-
-    public enum TrackVisibility
-    {
-        [JsonValue("all")]
-        All,
-        [JsonValue("public")]
-        Public,
-        [JsonValue("private")]
-        Private
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class QueryParameterAttribute : Attribute
-    {
-        public QueryParameterAttribute(string key)
-            : this(key, typeof(DefaultFormatter)) { }
-
-        public QueryParameterAttribute(string key, Type formatter)
+        public override void WriteValue(string value)
         {
-            Key = key;
-            Formatter = formatter;
+            builder.Append(value);
+            base.WriteValue(value);
         }
 
-        public string Key { get; }
+        public override void WriteValue(int value)
+        {
+            builder.Append(value);
+            base.WriteValue(value);
+        }
 
-        public Type Formatter { get; }
+        public string Value => builder.ToString();
+
+        public void Append(string s) => builder.Append(s);
+
+        public override void Flush() { }
+    }
+
+    public class CommaSeparatedList : JsonConverter
+    {
+        public override bool CanRead { get; } = false;
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            using (var sb = new StringBuildingWriter())
+            {
+                var e = (value as IEnumerable).GetEnumerator();
+
+                if (!e.MoveNext())
+                    return;
+
+                serializer.Serialize(sb, e.Current);
+
+                while (e.MoveNext())
+                {
+                    sb.Append(",");
+                    serializer.Serialize(sb, e.Current);
+                }
+
+                writer.WriteValue(sb.Value);
+            }
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool CanConvert(Type objectType) => typeof(IEnumerable).IsAssignableFrom(objectType);
+    }
+
+    [JsonConverter(typeof(EnumConverter<TrackVisibility>))]
+    public enum TrackVisibility
+    {
+        [JsonProperty("all")]
+        All,
+        [JsonProperty("public")]
+        Public,
+        [JsonProperty("private")]
+        Private
     }
 
     public class TracksRequestFilter
@@ -253,151 +270,86 @@ namespace Gustnado.Requests.Tracks
         /// <summary>
         /// a string to search for (see search documentation)
         /// </summary>
-        [QueryParameter("q")]
+        [JsonProperty("q")]
         public string Q { get; set; }
 
         /// <summary>
         /// a comma separated list of tags
         /// </summary>
-        [QueryParameter("tags", typeof(CommaSeparatedList))]
+        [JsonProperty("tags")]
+        [JsonConverter(typeof(CommaSeparatedList))]
         public List<string> Tags { get; set; }
 
         /// <summary>
         /// (all,public,private)
         /// </summary>
-        [QueryParameter("filter", typeof(EnumFormatter<TrackVisibility>))]
+        [JsonProperty("filter")]
         public TrackVisibility? Filter { get; set; }
 
         /// <summary>
         /// Filter on license. (see license attribute)
         /// </summary>
-        [QueryParameter("license", typeof(EnumFormatter<License>))]
+        [JsonProperty("license")]
         public License? License { get; set; }
 
         /// <summary>
         /// return tracks with at least this bpm value
         ///</summary>
-        [QueryParameter("bpm[from]")]
+        [JsonProperty("bpm[from]")]
         public int? BpmFrom { get; set; }
 
         /// <summary>
         /// return tracks with at most this bpm value
         ///</summary>
-        [QueryParameter("bpm[to]")]
+        [JsonProperty("bpm[to]")]
         public int? BpmTo { get; set; }
 
         /// <summary>
         /// return tracks with at least this duration (in millis)
         ///</summary>
-        [QueryParameter("duration[from]")]
+        [JsonProperty("duration[from]")]
         public int? DurationFrom { get; set; }
 
         /// <summary>
         /// return tracks with at most this duration (in millis)
         ///</summary>
-        [QueryParameter("duration[to]")]
+        [JsonProperty("duration[to]")]
         public int? DurationTo { get; set; }
 
         /// <summary>
         /// (yyyy-mm-dd hh:mm:ss) return tracks created at this date or later
         ///</summary>
-        [QueryParameter("created_at[from]", typeof(DateTimeFormatter))]
+        [JsonProperty("created_at[from]")]
+        [JsonConverter(typeof(SoundCloudDateTime))]
         public DateTime? CreateAtFrom { get; set; }
 
         /// <summary>
         /// (yyyy-mm-dd hh:mm:ss) return tracks created at this date or earlier
         ///</summary>
-        [QueryParameter("created_at[to]", typeof(DateTimeFormatter))]
+        [JsonProperty("created_at[to]")]
+        [JsonConverter(typeof(SoundCloudDateTime))]
         public DateTime? CreatedAtTo { get; set; }
 
         /// <summary>
         /// a comma separated list of track ids to filter on
         ///</summary>
-        [QueryParameter("ids", typeof(CommaSeparatedList))]
+        [JsonProperty("ids")]
+        [JsonConverter(typeof(CommaSeparatedList))]
         public List<int> Ids { get; set; }
 
         /// <summary>
         /// a comma separated list of genres
         ///</summary>
-        [QueryParameter("genres", typeof(CommaSeparatedList))]
+        [JsonProperty("genres")]
+        [JsonConverter(typeof(CommaSeparatedList))]
         public List<string> Genres { get; set; }
 
         /// <summary>
         /// a comma separated list of types
         ///</summary>
-        [QueryParameter("types", typeof(CommaSeparatedEnum<TrackType>))]
+        [JsonProperty("types")]
+        [JsonConverter(typeof(CommaSeparatedList))]
         public List<TrackType> Types { get; set; }
-    }
-
-    public static class QueryStringFormatter
-    {
-        public static IEnumerable<KeyValuePair<string, string>> FromObject<T>(T item)
-        {
-            return from property in typeof(T).GetProperties()
-                   from attribute in property.GetCustomAttribute<QueryParameterAttribute>().AsEnumerable()
-                   let value = property.GetMethod.Invoke(item)
-                   where value != null
-                   let formatter = (ParameterFormatter)Activator.CreateInstance(attribute.Formatter)
-                   select new KeyValuePair<string, string>(attribute.Key, formatter.Format(value));
-        }
-    }
-
-    public class RequestBodyWriter : JsonWriter
-    {
-        private readonly IRestRequest request;
-        private readonly string format;
-        public RequestBodyWriter(IRestRequest request, Option<string> format)
-        {
-            this.request = request;
-            this.format = format.Else(() => "{0}");
-        }
-        private string key;
-        public override void WritePropertyName(string name, bool escape)
-        {
-            key = string.Format(format, name);
-            base.WritePropertyName(name, escape);
-        }
-        private void Write(object obj)
-        {
-            obj.AsOption()
-                .WhenSome(value => request.AddParameter(key, value));
-        }
-        public override void WriteValue(string value)
-        {
-            Write(value);
-            base.WriteValue(value);
-        }
-        public override void WriteValue(int value)
-        {
-            Write(value);
-            base.WriteValue(value);
-        }
-        public override void WriteValue(bool value)
-        {
-            Write(value);
-            base.WriteValue(value);
-        }
-        public void WriteFile(string path)
-        {
-            request.AddFile(key, path);
-            base.WriteValue(path);
-        }
-        public override void Flush()
-        {
-        }
-    }
-
-    public class AddToRequestBodyAsFile : JsonConverter
-    {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.MaybeCast<RequestBodyWriter>()
-                .WhenSome(w => w.WriteFile((string)value))
-                //Note that this leaves us with a null regardless of serialisation settings, as the prop name had already been written at this point
-                .WhenNone(writer.WriteNull);
-        }
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => null;
-        public override bool CanConvert(Type type) => type == typeof(string);
     }
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -408,40 +360,5 @@ namespace Gustnado.Requests.Tracks
         {
             Format = format;
         }
-    }
-
-    public class CustomSerializer : ISerializer, IDeserializer
-    {
-        private readonly JsonSerializerSettings settings;
-
-        public CustomSerializer() : this(new JsonSerializerSettings()) { }
-
-        public CustomSerializer(JsonSerializerSettings settings)
-        {
-            this.settings = settings;
-        }
-
-        public string Serialize(object obj)
-        {
-            return JsonConvert.SerializeObject(obj, settings);
-        }
-
-        public T Deserialize<T>(IRestResponse response)
-        {
-            return JsonConvert.DeserializeObject<T>(response.Content, settings);
-        }
-
-        public static CustomSerializer Default = new CustomSerializer(new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore
-        });
-
-        string IDeserializer.RootElement { get; set; }
-        string IDeserializer.Namespace { get; set; }
-        string IDeserializer.DateFormat { get; set; }
-        string ISerializer.RootElement { get; set; }
-        string ISerializer.Namespace { get; set; }
-        string ISerializer.DateFormat { get; set; }
-        public string ContentType { get; set; }
     }
 }

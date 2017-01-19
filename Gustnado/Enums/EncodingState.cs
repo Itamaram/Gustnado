@@ -6,11 +6,11 @@ namespace Gustnado.Enums
     [JsonConverter(typeof(EnumConverter<EncodingState>))]
     public enum EncodingState
     {
-        [JsonValue("processing")]
+        [JsonProperty("processing")]
         Processing,
-        [JsonValue("failed")]
+        [JsonProperty("failed")]
         Failed,
-        [JsonValue("finished")]
+        [JsonProperty("finished")]
         Finished
     }
 }

@@ -68,15 +68,15 @@ namespace Gustnado.Objects
     [JsonConverter(typeof(EnumConverter<GrantType>))]
     public enum GrantType
     {
-        [JsonValue("authorization_code")]
+        [JsonProperty("authorization_code")]
         AuthorizationCode,
-        [JsonValue("refresh_token")]
+        [JsonProperty("refresh_token")]
         RefreshToken,
-        [JsonValue("password")]
+        [JsonProperty("password")]
         Password,
-        [JsonValue("client_credentials")]
+        [JsonProperty("client_credentials")]
         ClientCredentials,
-        [JsonValue("oauth1_token")]
+        [JsonProperty("oauth1_token")]
         OAuth1Token
     }
 }

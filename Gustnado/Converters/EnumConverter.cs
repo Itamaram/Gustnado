@@ -18,7 +18,7 @@ namespace Gustnado.Converters
                 throw new InvalidOperationException();
 
             fromJson = Enum.GetNames(typeof(T)).Select(name => typeof(T).GetMember(name).Single()).ToDictionary(
-                m => m.GetCustomAttributes().OfType<JsonValueAttribute>().Single().Value,
+                m => m.GetCustomAttributes().OfType<JsonPropertyAttribute>().Single().PropertyName,
                 m => (T)Enum.Parse(typeof(T), m.Name));
 
             toJson = fromJson.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
@@ -45,17 +45,5 @@ namespace Gustnado.Converters
         }
 
         public override bool CanConvert(Type type) => type == typeof(T);
-    }
-
-    //todo rename this. SlaveNameAttribute?
-    [AttributeUsage(AttributeTargets.Field)]
-    public class JsonValueAttribute : Attribute
-    {
-        public string Value { get; }
-
-        public JsonValueAttribute(string value)
-        {
-            Value = value;
-        }
     }
 }

@@ -6,23 +6,23 @@ namespace Gustnado.Enums
     [JsonConverter(typeof(EnumConverter<PlaylistType>))]
     public enum PlaylistType
     {
-        [JsonValue("ep single")]
+        [JsonProperty("ep single")]
         EpSingle,
-        [JsonValue("album")]
+        [JsonProperty("album")]
         Album,
-        [JsonValue("compilation")]
+        [JsonProperty("compilation")]
         Compilation,
-        [JsonValue("project files")]
+        [JsonProperty("project files")]
         ProjectFiles,
-        [JsonValue("archive")]
+        [JsonProperty("archive")]
         Archive,
-        [JsonValue("showcase")]
+        [JsonProperty("showcase")]
         Showcase,
-        [JsonValue("demo")]
+        [JsonProperty("demo")]
         Demo,
-        [JsonValue("sample pack")]
+        [JsonProperty("sample pack")]
         SamplePack,
-        [JsonValue("other")]
+        [JsonProperty("other")]
         Other
     }
 }

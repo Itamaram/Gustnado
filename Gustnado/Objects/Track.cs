@@ -2,6 +2,7 @@ using System;
 using Gustnado.Converters;
 using Gustnado.Enums;
 using Gustnado.Requests.Tracks;
+using Gustnado.Serialisation;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects
