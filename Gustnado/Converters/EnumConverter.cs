@@ -38,10 +38,14 @@ namespace Gustnado.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return reader.Value.AsOption()
+            var option = reader.Value.AsOption()
                 .Map(v => v.ToString())
-                .Map(EnumJsonValueMap<T>.FromJson)
-                .Else(() => null);
+                .SelectMany(EnumJsonValueMap<T>.FromJson);
+
+            if (option)
+                return option.ForceValue();
+
+            return null;
         }
 
         public override bool CanConvert(Type type) => type == typeof(T);

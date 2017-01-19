@@ -12,7 +12,7 @@ namespace Gustnado.Endpoints.Playlists
 
         public RestRequestMany<Playlist> Get(PlaylistsFilters filters)
         {
-            return new RestRequestMany<Playlist>(context)
+            return new RestRequestMany<Playlist>(context);
                 .WriteToQueryString(filters);
         }
 

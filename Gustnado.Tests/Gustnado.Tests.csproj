@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Converters\CommaSeparatedListTests.cs" />
     <Compile Include="Converters\DateTimeFormatterTests.cs" />
+    <Compile Include="Converters\EnumberConverterTests.cs" />
     <Compile Include="Converters\TrackCompactorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecretConstants.cs" />
