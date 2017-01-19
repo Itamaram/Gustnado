@@ -9,11 +9,6 @@ namespace Gustnado.RestSharp
         public RestRequest(SearchContext context, Method method)
             : base(context.AsResource(), method) { }
 
-        public RestRequest<T> AddSoundCloudObject<A>(A item)
-        {
-            return this.WriteToRequest(item);
-        }
-
         public static RestRequest<T> Get(SearchContext context)
         {
             return new RestRequest<T>(context, Method.GET);

@@ -1,4 +1,5 @@
-﻿using Gustnado.Objects;
+﻿using Gustnado.Extensions;
+using Gustnado.Objects;
 using Gustnado.RestSharp;
 
 namespace Gustnado.Endpoints.OAuth
@@ -10,7 +11,7 @@ namespace Gustnado.Endpoints.OAuth
         public RestRequest<OAuthResponse> Post(OAuthRequest oauth)
         {
             return RestRequest<OAuthResponse>.Post(context)
-                .AddSoundCloudObject(oauth);
+                .WriteToRequest(oauth);
         } 
 
         //todo convenience methods for different auth types

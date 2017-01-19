@@ -4,6 +4,7 @@ using Gustnado.RestSharp;
 
 namespace Gustnado.Endpoints.Users
 {
+    //todo make this not readonly
     public class UsersEndpoint
     {
         private static readonly SearchContext context = new SearchContext("users");

@@ -27,7 +27,7 @@ namespace Gustnado.Endpoints.Tracks
         public RestRequest<Track> Post(Track track)
         {
             return RestRequest<Track>.Post(context)
-                .AddSoundCloudObject(track);
+                .WriteToRequest(track);
         }
 
         public TrackEndpoint this[int id] => new TrackEndpoint(context, id);
@@ -47,7 +47,7 @@ namespace Gustnado.Endpoints.Tracks
         public RestRequest<Track> Put(Track track)
         {
             return RestRequest<Track>.Put(context)
-                .AddSoundCloudObject(track);
+                .WriteToRequest(track);
         }
 
         public RestRequest<object> Delete() => RestRequest<object>.Delete(context);
@@ -74,8 +74,7 @@ namespace Gustnado.Endpoints.Tracks
         public RestRequest<Comment> Post(Comment comment)
         {
             return RestRequest<Comment>.Post(context)
-                //todo pretty sure this is wrong, Should be sending as json, not as request body
-                .AddSoundCloudObject(comment);
+                .AddJsonToRequestBody(comment);
         }
 
         public TrackCommentEndpoint this[int id] => new TrackCommentEndpoint(context, id);
@@ -95,7 +94,7 @@ namespace Gustnado.Endpoints.Tracks
         public RestRequest<Comment> Put(Comment comment)
         {
             return RestRequest<Comment>.Put(context)
-                .AddSoundCloudObject(comment);
+                .AddJsonToRequestBody(comment);
         }
     }
 
@@ -137,7 +136,7 @@ namespace Gustnado.Endpoints.Tracks
         public RestRequest<object> Put(string secret)
         {
             return RestRequest<object>.Put(contexet)
-                .AddSoundCloudObject(new SecretTokenContainer { SecretToken = secret });
+                .AddJsonToRequestBody(new SecretTokenContainer { SecretToken = secret });
         }
 
         public RestRequest<SecretTokenContainer> Get()
