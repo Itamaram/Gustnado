@@ -4,7 +4,7 @@ using Gustnado.RestSharp;
 
 namespace Gustnado.Endpoints.Users
 {
-    public class UsersRequest
+    public class UsersEndpoint
     {
         private static readonly SearchContext context = new SearchContext("users");
 
@@ -16,34 +16,34 @@ namespace Gustnado.Endpoints.Users
                 .Do(r => q.WhenSome(query => r.AddQueryParameter("q", query)));
         }
 
-        public UserRequest this[int id] => new UserRequest(context, id);
+        public UserEndpoint this[int id] => new UserEndpoint(context, id);
     }
 
-    public class UserRequest
+    public class UserEndpoint
     {
         private readonly SearchContext context;
 
-        public UserRequest(SearchContext context, int id)
+        public UserEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
 
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
 
-        public UserTracksRequest Tracks => new UserTracksRequest(context);
-        public UserPlaylistsRequest Playlists => new UserPlaylistsRequest(context);
-        public FollowingsRequest Followings => new FollowingsRequest( context);
-        public FollowersRequest Followers => new FollowersRequest( context);
-        public CommentsRequest Comments => new CommentsRequest( context);
-        public FavoritesRequest Favorites => new FavoritesRequest( context);
-        public WebProfilesRequest WebProfiles => new WebProfilesRequest( context);
+        public UserTracksEndpoint Tracks => new UserTracksEndpoint(context);
+        public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(context);
+        public FollowingsEndpoint Followings => new FollowingsEndpoint( context);
+        public FollowersEndpoint Followers => new FollowersEndpoint( context);
+        public CommentsEndpoint Comments => new CommentsEndpoint( context);
+        public FavoritesEndpoint Favorites => new FavoritesEndpoint( context);
+        public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint( context);
     }
     
-    public class UserTracksRequest
+    public class UserTracksEndpoint
     {
         private readonly SearchContext context;
 
-        public UserTracksRequest(SearchContext context)
+        public UserTracksEndpoint(SearchContext context)
         {
             this.context = context.Add("tracks");
         }
@@ -51,11 +51,11 @@ namespace Gustnado.Endpoints.Users
         public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
     }
     
-    public class UserPlaylistsRequest
+    public class UserPlaylistsEndpoint
     {
         private readonly SearchContext context;
 
-        public UserPlaylistsRequest(SearchContext context)
+        public UserPlaylistsEndpoint(SearchContext context)
         {
             this.context = context.Add("playlists");
         }
@@ -63,25 +63,25 @@ namespace Gustnado.Endpoints.Users
         public RestRequestMany<Playlist> Get() => new RestRequestMany<Playlist>(context);
     }
 
-    public class FollowingsRequest
+    public class FollowingsEndpoint
     {
         private readonly SearchContext context;
 
-        public FollowingsRequest(SearchContext context)
+        public FollowingsEndpoint(SearchContext context)
         {
             this.context = context.Add("followings");
         }
 
         public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
 
-        public UserFollowingRequest this[int id] => new UserFollowingRequest(context, id);
+        public UserFollowingEndpoint this[int id] => new UserFollowingEndpoint(context, id);
     }
 
-    public class UserFollowingRequest
+    public class UserFollowingEndpoint
     {
         private readonly SearchContext context;
 
-        public UserFollowingRequest(SearchContext context, int id)
+        public UserFollowingEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -89,25 +89,25 @@ namespace Gustnado.Endpoints.Users
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
 
-    public class FollowersRequest
+    public class FollowersEndpoint
     {
         private readonly SearchContext context;
 
-        public FollowersRequest(SearchContext context)
+        public FollowersEndpoint(SearchContext context)
         {
             this.context = context.Add("followers");
         }
 
         public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
 
-        public FollowerRequest this[int id] => new FollowerRequest(context, id);
+        public FollowerEndpoint this[int id] => new FollowerEndpoint(context, id);
     }
 
-    public class FollowerRequest
+    public class FollowerEndpoint
     {
         private readonly SearchContext context;
 
-        public FollowerRequest(SearchContext context, int id)
+        public FollowerEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -115,11 +115,11 @@ namespace Gustnado.Endpoints.Users
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
     
-    public class CommentsRequest
+    public class CommentsEndpoint
     {
         private readonly SearchContext context;
 
-        public CommentsRequest(SearchContext context)
+        public CommentsEndpoint(SearchContext context)
         {
             this.context = context.Add("comments");
         }
@@ -127,25 +127,25 @@ namespace Gustnado.Endpoints.Users
         public RestRequestMany<Comment> Get() => new RestRequestMany<Comment>(context);
     }
     
-    public class FavoritesRequest
+    public class FavoritesEndpoint
     {
         private readonly SearchContext context;
 
-        public FavoritesRequest(SearchContext context)
+        public FavoritesEndpoint(SearchContext context)
         {
             this.context = context.Add("favorites");
         }
 
         public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
 
-        public FavoriteRequest this[int id] => new FavoriteRequest(context,id);
+        public FavoriteEndpoint this[int id] => new FavoriteEndpoint(context,id);
     }
 
-    public class FavoriteRequest
+    public class FavoriteEndpoint
     {
         private readonly SearchContext context;
 
-        public FavoriteRequest(SearchContext context, int id)
+        public FavoriteEndpoint(SearchContext context, int id)
         {
             this.context = context.Add(id);
         }
@@ -153,11 +153,11 @@ namespace Gustnado.Endpoints.Users
         public RestRequest<Track> Get() => RestRequest<Track>.Get(context);
     }
 
-    public class WebProfilesRequest 
+    public class WebProfilesEndpoint 
     {
         private readonly SearchContext context;
 
-        public WebProfilesRequest(SearchContext context)
+        public WebProfilesEndpoint(SearchContext context)
         {
             this.context = context.Add("web-profiles");
         }

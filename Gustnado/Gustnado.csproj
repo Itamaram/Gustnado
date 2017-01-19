@@ -74,8 +74,8 @@
     <Compile Include="Endpoints\Playlists\PlaylistsEndpoint.cs" />
     <Compile Include="Endpoints\SoundCloudApi.cs" />
     <Compile Include="Endpoints\Tracks\TracksEndpoint.cs" />
-    <Compile Include="Endpoints\Users\MeRequest.cs" />
-    <Compile Include="Endpoints\Users\Users.cs" />
+    <Compile Include="Endpoints\Users\MeEndpoint.cs" />
+    <Compile Include="Endpoints\Users\UsersEndpoint.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
     <Compile Include="RestSharp\RestRequest.cs" />
     <Compile Include="RestSharp\RestRequestMany.cs" />
