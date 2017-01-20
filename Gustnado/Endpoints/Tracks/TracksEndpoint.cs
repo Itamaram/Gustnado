@@ -15,12 +15,12 @@ namespace Gustnado.Endpoints.Tracks
 
         public RestRequestMany<Track> Get()
         {
-            return new RestRequestMany<Track>(context);
+            return RestRequestMany<Track>.Get(context);
         }
 
         public RestRequestMany<Track> Get(TracksRequestFilter filter)
         {
-            return new RestRequestMany<Track>(context)
+            return RestRequestMany<Track>.Get(context)
                 .WriteToQueryString(filter);
         }
 
@@ -68,7 +68,7 @@ namespace Gustnado.Endpoints.Tracks
 
         public RestRequestMany<Comment> Get()
         {
-            return new RestRequestMany<Comment>(context);
+            return RestRequestMany<Comment>.Get(context);
         }
 
         public RestRequest<Comment> Post(Comment comment)
@@ -107,7 +107,7 @@ namespace Gustnado.Endpoints.Tracks
             this.context = context.Add("favoriters");
         }
 
-        public RestRequest<IEnumerable<User>> Get() => RestRequest<IEnumerable<User>>.Get(context);
+        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(context);
 
         public TrackFavoriterEndpoint this[int id] => new TrackFavoriterEndpoint(context, id);
     }

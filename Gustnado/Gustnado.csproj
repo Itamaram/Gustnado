@@ -53,7 +53,6 @@
     <Compile Include="Converters\CommaSeparatedList.cs" />
     <Compile Include="Converters\SoundCloudDateTime.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
-    <Compile Include="Converters\IntToBoolConverter.cs" />
     <Compile Include="Converters\TrackCompactor.cs" />
     <Compile Include="Endpoints\Apps\AppsEndpoint.cs" />
     <Compile Include="Endpoints\Comments\CommentsEndpoint.cs" />
@@ -62,6 +61,7 @@
     <Compile Include="Enums\PlaylistType.cs" />
     <Compile Include="Enums\TrackType.cs" />
     <Compile Include="Enums\TrackVisibility.cs" />
+    <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Objects\App.cs" />
     <Compile Include="Objects\Comment.cs" />
@@ -80,8 +80,10 @@
     <Compile Include="Endpoints\Users\MeEndpoint.cs" />
     <Compile Include="Endpoints\Users\UsersEndpoint.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
+    <Compile Include="RestSharp\RedirectRequest.cs" />
     <Compile Include="RestSharp\RestRequest.cs" />
     <Compile Include="RestSharp\RestRequestMany.cs" />
+    <Compile Include="RestSharp\SoundCloudRestRequest.cs" />
     <Compile Include="Serialisation\AddToRequestBodyAsFile.cs" />
     <Compile Include="Serialisation\CustomSerializer.cs" />
     <Compile Include="Serialisation\RequestQueryStringWriter.cs" />

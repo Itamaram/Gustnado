@@ -13,7 +13,7 @@ namespace Gustnado.Endpoints.Users
 
         public RestRequestMany<User> Get(Option<string> q)
         {
-            return new RestRequestMany<User>(context)
+            return RestRequestMany<User>.Get(context)
                 .Do(r => q.WhenSome(query => r.AddQueryParameter("q", query)));
         }
 
@@ -49,7 +49,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("tracks");
         }
 
-        public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
+        public RestRequestMany<Track> Get() => RestRequestMany<Track>.Get(context);
     }
     
     public class UserPlaylistsEndpoint
@@ -61,7 +61,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("playlists");
         }
 
-        public RestRequestMany<Playlist> Get() => new RestRequestMany<Playlist>(context);
+        public RestRequestMany<Playlist> Get() => RestRequestMany<Playlist>.Get(context);
     }
 
     public class FollowingsEndpoint
@@ -73,7 +73,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("followings");
         }
 
-        public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
+        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(context);
 
         public UserFollowingEndpoint this[int id] => new UserFollowingEndpoint(context, id);
     }
@@ -99,7 +99,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("followers");
         }
 
-        public RestRequestMany<User> Get() => new RestRequestMany<User>(context);
+        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(context);
 
         public FollowerEndpoint this[int id] => new FollowerEndpoint(context, id);
     }
@@ -125,7 +125,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("comments");
         }
 
-        public RestRequestMany<Comment> Get() => new RestRequestMany<Comment>(context);
+        public RestRequestMany<Comment> Get() => RestRequestMany<Comment>.Get(context);
     }
     
     public class FavoritesEndpoint
@@ -137,7 +137,7 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("favorites");
         }
 
-        public RestRequestMany<Track> Get() => new RestRequestMany<Track>(context);
+        public RestRequestMany<Track> Get() => RestRequestMany<Track>.Get(context);
 
         public FavoriteEndpoint this[int id] => new FavoriteEndpoint(context,id);
     }
@@ -163,6 +163,6 @@ namespace Gustnado.Endpoints.Users
             this.context = context.Add("web-profiles");
         }
 
-        public RestRequestMany<WebProfile> Get() => new RestRequestMany<WebProfile>(context);
+        public RestRequestMany<WebProfile> Get() => RestRequestMany<WebProfile>.Get(context);
     }
 }

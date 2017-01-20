@@ -3,8 +3,7 @@ using RestSharp;
 
 namespace Gustnado.RestSharp
 {
-    //todo override json serializer?
-    public class RestRequest<T> : RestRequest
+    public class RestRequest<T> : RestRequest, SoundCloudRestRequest<T> where T : new()
     {
         public RestRequest(SearchContext context, Method method)
             : base(context.AsResource(), method) { }
@@ -27,6 +26,14 @@ namespace Gustnado.RestSharp
         public static RestRequest<T> Delete(SearchContext context)
         {
             return new RestRequest<T>(context, Method.DELETE);
+        }
+
+        public T Execute(SoundCloudHttpClient client)
+        {
+            //todo error handling :/
+            return this.AddClientId(client)
+                .Authenticate(client)
+                .Map(r => client.Http.Execute<T>(r).Data);
         }
     }
 }

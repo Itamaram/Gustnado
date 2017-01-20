@@ -69,26 +69,20 @@ namespace Gustnado
 
         public static object Invoke(this MethodBase m, object o) => m.Invoke(o, new object[0]);
     }
-
-    public class SoundCloudHttpClientFactory
-    {
-
-    }
-
+    
     //This can be instantiated as either authed, or not authed. It also takes care of reauthing.
     //todo should this be abstract?
     public class SoundCloudHttpClient
     {
         private readonly string clientId;
         private readonly string secret;
-        private readonly IRestClient http;
         private Option<string> oauth = Option<string>.None;
 
         public SoundCloudHttpClient(string clientId, string secret, IRestClient http)
         {
             this.clientId = clientId;
             this.secret = secret;
-            this.http = http;
+            Http = http;
         }
 
         public SoundCloudHttpClient Authenticate(string token)
@@ -108,40 +102,23 @@ namespace Gustnado
                 Password = password,
             });
 
-            oauth = http.Execute<OAuthResponse>(request).Data.AccessToken;
+            oauth = Http.Execute<OAuthResponse>(request).Data.AccessToken;
 
             return this;
         }
 
-        public T Execute<T>(RestRequest<T> request) where T : new()
+        public IRestClient Http { get; }
+
+        public Request Authenticate<Request>(Request r) where Request : IRestRequest
         {
-            //todo error handling :/
-            return request.AddQueryParameter("client_id", clientId)
-                .AddQueryParameter("oauth_token", oauth)
-                .Map(r => http.Execute<T>(r).Data);
+            r.AddQueryParameter("oauth_token", oauth);
+            return r;
         }
 
-        public IEnumerable<T> Execute<T>(RestRequestMany<T> request, int limit = 50)
+        public Request AddClientId<Request>(Request r) where Request : IRestRequest
         {
-            return GetPages(request, limit).SelectMany(p => p.Collection);
-        }
-
-        private IEnumerable<PaginationResult<T>> GetPages<T>(RestRequestMany<T> request, int limit)
-        {
-            var page = request.AddQueryParameter("client_id", clientId)
-                .AddQueryParameter("oauth_token", oauth)
-                .AddQueryParameter("linked_partitioning", "1")
-                .AddQueryParameter("limit", limit.ToString())
-                .Map(r => http.Execute<PaginationResult<T>>(r).Data);
-
-            yield return page;
-
-            while (page.NextHref != null)
-            {
-                page = http.Execute<PaginationResult<T>>(new RestRequest(page.NextHref.PathAndQuery())).Data;
-
-                yield return page;
-            }
+            r.AddQueryParameter("client_id", clientId);
+            return r;
         }
     }
 
@@ -183,14 +160,5 @@ namespace Gustnado
     public static class Constants
     {
         public static string ApiEndpoint = "https://api.soundcloud.com";
-    }
-
-    public class PaginationResult<T>
-    {
-        [JsonProperty("collection")]
-        public List<T> Collection { get; set; }
-
-        [JsonProperty("next_href")]
-        public string NextHref { get; set; }
     }
 }
