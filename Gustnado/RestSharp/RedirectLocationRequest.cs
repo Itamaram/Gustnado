@@ -5,9 +5,9 @@ using RestSharp;
 
 namespace Gustnado.RestSharp
 {
-    public class RedirectRequest : RestRequest, SoundCloudRestRequest<string>
+    public class RedirectLocationRequest : RestRequest, SoundCloudRestRequest<string>
     {
-        public RedirectRequest(string url)
+        public RedirectLocationRequest(string url)
         {
             AddQueryParameter("url", url);
         }
@@ -18,7 +18,7 @@ namespace Gustnado.RestSharp
                 .Execute(client.Authenticate(this));
 
             if(response.StatusCode != HttpStatusCode.Redirect)
-                throw new Exception("RedirectRequest returned non redirect response");
+                throw new Exception("RedirectLocationRequest returned non redirect response");
 
             return (string) response.Headers.First(p => p.Name == "Location").Value;
         }

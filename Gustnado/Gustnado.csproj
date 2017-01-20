@@ -80,7 +80,7 @@
     <Compile Include="Endpoints\Users\MeEndpoint.cs" />
     <Compile Include="Endpoints\Users\UsersEndpoint.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
-    <Compile Include="RestSharp\RedirectRequest.cs" />
+    <Compile Include="RestSharp\RedirectLocationRequest.cs" />
     <Compile Include="RestSharp\RestRequest.cs" />
     <Compile Include="RestSharp\RestRequestMany.cs" />
     <Compile Include="RestSharp\SoundCloudRestRequest.cs" />
