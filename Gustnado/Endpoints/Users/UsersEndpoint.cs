@@ -35,7 +35,7 @@ namespace Gustnado.Endpoints.Users
         public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(context);
         public FollowingsEndpoint Followings => new FollowingsEndpoint( context);
         public FollowersEndpoint Followers => new FollowersEndpoint( context);
-        public CommentsEndpoint Comments => new CommentsEndpoint( context);
+        public UserCommentsEndpoint Comments => new UserCommentsEndpoint( context);
         public FavoritesEndpoint Favorites => new FavoritesEndpoint( context);
         public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint( context);
     }
@@ -116,11 +116,11 @@ namespace Gustnado.Endpoints.Users
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
     
-    public class CommentsEndpoint
+    public class UserCommentsEndpoint
     {
         private readonly SearchContext context;
 
-        public CommentsEndpoint(SearchContext context)
+        public UserCommentsEndpoint(SearchContext context)
         {
             this.context = context.Add("comments");
         }
