@@ -62,6 +62,12 @@ namespace Gustnado.Objects
         [JsonProperty("state")]
         public string State { get; set; }
 
+        [JsonProperty("expires_in")]
+        public int? ExpiresIn { get; set; }
+
+        [JsonProperty("refresh_token")]
+        public string RefreshToken { get; set; }
+
         //todo error?
     }
 

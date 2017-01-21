@@ -66,6 +66,7 @@
     <Compile Include="Objects\App.cs" />
     <Compile Include="Objects\Comment.cs" />
     <Compile Include="Objects\Connection.cs" />
+    <Compile Include="Objects\DeleteResponse.cs" />
     <Compile Include="Objects\Me.cs" />
     <Compile Include="Objects\OAuth.cs" />
     <Compile Include="Objects\PlayList.cs" />

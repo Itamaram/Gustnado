@@ -1,10 +1,10 @@
 ﻿using Bearded.Monads;
+using Gustnado.Extensions;
 using Gustnado.Objects;
 using Gustnado.RestSharp;
 
 namespace Gustnado.Endpoints.Users
 {
-    //todo make this not readonly
     public class UsersEndpoint
     {
         private static readonly SearchContext context = new SearchContext("users");
@@ -14,7 +14,7 @@ namespace Gustnado.Endpoints.Users
         public RestRequestMany<User> Get(Option<string> q)
         {
             return RestRequestMany<User>.Get(context)
-                .Do(r => q.WhenSome(query => r.AddQueryParameter("q", query)));
+                .AddQueryParameter("q", q);
         }
 
         public UserEndpoint this[int id] => new UserEndpoint(context, id);
@@ -88,6 +88,10 @@ namespace Gustnado.Endpoints.Users
         }
 
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
+
+        public RestRequest<DeleteResponse> Put() => RestRequest<DeleteResponse>.Put(context);
+
+        public RestRequest<User> Delete() => RestRequest<User>.Delete(context);
     }
 
     public class FollowersEndpoint
@@ -152,6 +156,10 @@ namespace Gustnado.Endpoints.Users
         }
 
         public RestRequest<Track> Get() => RestRequest<Track>.Get(context);
+
+        public RestRequest<Track> Put() => RestRequest<Track>.Put(context);
+        
+        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context); 
     }
 
     public class WebProfilesEndpoint 
@@ -164,5 +172,7 @@ namespace Gustnado.Endpoints.Users
         }
 
         public RestRequestMany<WebProfile> Get() => RestRequestMany<WebProfile>.Get(context);
+
+        //todo PUT DELETE
     }
 }
