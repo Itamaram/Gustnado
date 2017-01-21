@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\RequestBodyKeyFormatAttribute.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Converters\CommaSeparatedList.cs" />
     <Compile Include="Converters\SoundCloudDateTime.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
@@ -61,6 +61,9 @@
     <Compile Include="Enums\PlaylistType.cs" />
     <Compile Include="Enums\TrackType.cs" />
     <Compile Include="Enums\TrackVisibility.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\OptionsExtensions.cs" />
+    <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Objects\App.cs" />
@@ -80,16 +83,19 @@
     <Compile Include="Endpoints\Tracks\TracksEndpoint.cs" />
     <Compile Include="Endpoints\Users\MeEndpoint.cs" />
     <Compile Include="Endpoints\Users\UsersEndpoint.cs" />
+    <Compile Include="RestSharp\GustnadoRestClient.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
     <Compile Include="RestSharp\RedirectLocationRequest.cs" />
     <Compile Include="RestSharp\RestRequest.cs" />
     <Compile Include="RestSharp\RestRequestMany.cs" />
     <Compile Include="RestSharp\SoundCloudRestRequest.cs" />
+    <Compile Include="SearchContext.cs" />
     <Compile Include="Serialisation\AddToRequestBodyAsFile.cs" />
     <Compile Include="Serialisation\CustomSerializer.cs" />
     <Compile Include="Serialisation\RequestQueryStringWriter.cs" />
     <Compile Include="Serialisation\RequestWriter.cs" />
     <Compile Include="Serialisation\SerialiserSettingsPresets.cs" />
+    <Compile Include="SoundCloudHttpClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

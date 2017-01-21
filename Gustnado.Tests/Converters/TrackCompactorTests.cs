@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Gustnado.Converters;
+using Gustnado.Extensions;
 using Gustnado.Objects;
 using Newtonsoft.Json;
 using NUnit.Framework;
