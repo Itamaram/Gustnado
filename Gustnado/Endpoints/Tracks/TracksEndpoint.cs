@@ -24,9 +24,9 @@ namespace Gustnado.Endpoints.Tracks
                 .WriteToQueryString(filter);
         }
 
-        public RestRequest<Track> Post(Track track)
+        public RestRequest<Track> Put(Track track)
         {
-            return RestRequest<Track>.Post(context)
+            return RestRequest<Track>.Put(context)
                 .WriteToRequest(track);
         }
 
@@ -71,9 +71,9 @@ namespace Gustnado.Endpoints.Tracks
             return RestRequestMany<Comment>.Get(context);
         }
 
-        public RestRequest<Comment> Post(Comment comment)
+        public RestRequest<Comment> Put(Comment comment)
         {
-            return RestRequest<Comment>.Post(context)
+            return RestRequest<Comment>.Put(context)
                 .AddJsonToRequestBody(comment);
         }
 
@@ -96,6 +96,8 @@ namespace Gustnado.Endpoints.Tracks
             return RestRequest<Comment>.Put(context)
                 .AddJsonToRequestBody(comment);
         }
+
+        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context);
     }
 
     public class TrackFavoritersEndpoint
@@ -133,9 +135,9 @@ namespace Gustnado.Endpoints.Tracks
             this.contexet = contexet.Add("secret-token");
         }
 
-        public RestRequest<object> Put(string secret)
+        public RestRequest<SecretTokenContainer> Put(string secret)
         {
-            return RestRequest<object>.Put(contexet)
+            return RestRequest<SecretTokenContainer>.Put(contexet)
                 .AddJsonToRequestBody(new SecretTokenContainer { SecretToken = secret });
         }
 

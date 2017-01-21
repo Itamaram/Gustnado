@@ -36,9 +36,9 @@ namespace Gustnado.Endpoints.Playlists
 
         public RestRequest<Playlist> Get() => RestRequest<Playlist>.Get(context);
 
-        public RestRequest<Playlist> Post(Playlist playlist)
+        public RestRequest<Playlist> Put(Playlist playlist)
         {
-            return RestRequest<Playlist>.Post(context)
+            return RestRequest<Playlist>.Put(context)
                 .AddJsonToRequestBody(playlist);
         }
     }
