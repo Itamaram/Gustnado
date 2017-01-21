@@ -1,7 +1,7 @@
 ﻿using Gustnado.Objects;
 using Gustnado.RestSharp;
 
-namespace Gustnado.Endpoints.Comments
+namespace Gustnado.Endpoints
 {
     public class CommentsEndpoint
     {

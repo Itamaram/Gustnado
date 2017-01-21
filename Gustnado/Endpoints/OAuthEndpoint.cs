@@ -2,7 +2,7 @@
 using Gustnado.Objects;
 using Gustnado.RestSharp;
 
-namespace Gustnado.Endpoints.OAuth
+namespace Gustnado.Endpoints
 {
     public class OAuthEndpoint
     {

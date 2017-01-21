@@ -45,7 +45,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\RequestBodyKeyFormatAttribute.cs" />
@@ -54,8 +53,8 @@
     <Compile Include="Converters\SoundCloudDateTime.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
     <Compile Include="Converters\TrackCompactor.cs" />
-    <Compile Include="Endpoints\Apps\AppsEndpoint.cs" />
-    <Compile Include="Endpoints\Comments\CommentsEndpoint.cs" />
+    <Compile Include="Endpoints\AppsEndpoint.cs" />
+    <Compile Include="Endpoints\CommentsEndpoint.cs" />
     <Compile Include="Enums\EncodingState.cs" />
     <Compile Include="Enums\License.cs" />
     <Compile Include="Enums\PlaylistType.cs" />
@@ -77,12 +76,12 @@
     <Compile Include="Objects\User.cs" />
     <Compile Include="Objects\WebProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Endpoints\OAuth\OAuthEndpoint.cs" />
-    <Compile Include="Endpoints\Playlists\PlaylistsEndpoint.cs" />
+    <Compile Include="Endpoints\OAuthEndpoint.cs" />
+    <Compile Include="Endpoints\PlaylistsEndpoint.cs" />
     <Compile Include="Endpoints\SoundCloudApi.cs" />
-    <Compile Include="Endpoints\Tracks\TracksEndpoint.cs" />
-    <Compile Include="Endpoints\Users\MeEndpoint.cs" />
-    <Compile Include="Endpoints\Users\UsersEndpoint.cs" />
+    <Compile Include="Endpoints\TracksEndpoint.cs" />
+    <Compile Include="Endpoints\MeEndpoint.cs" />
+    <Compile Include="Endpoints\UsersEndpoint.cs" />
     <Compile Include="RestSharp\GustnadoRestClient.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
     <Compile Include="RestSharp\RedirectLocationRequest.cs" />

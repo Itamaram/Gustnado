@@ -3,7 +3,7 @@ using Gustnado.Objects;
 using Gustnado.RestSharp;
 using Newtonsoft.Json;
 
-namespace Gustnado.Endpoints.Users
+namespace Gustnado.Endpoints
 {
     public class MeEndpoint
     {

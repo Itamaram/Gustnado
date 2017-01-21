@@ -4,7 +4,7 @@ using Gustnado.Objects;
 using Gustnado.RestSharp;
 using Newtonsoft.Json;
 
-namespace Gustnado.Endpoints.Playlists
+namespace Gustnado.Endpoints
 {
     public class PlaylistsEndpoint
     {

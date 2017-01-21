@@ -1,7 +1,7 @@
 ﻿using Gustnado.Objects;
 using Gustnado.RestSharp;
 
-namespace Gustnado.Endpoints.Apps
+namespace Gustnado.Endpoints
 {
     public class AppsEndpoint
     {

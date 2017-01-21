@@ -7,7 +7,7 @@ using Gustnado.Objects;
 using Gustnado.RestSharp;
 using Newtonsoft.Json;
 
-namespace Gustnado.Endpoints.Tracks
+namespace Gustnado.Endpoints
 {
     public class TracksEndpoint
     {
