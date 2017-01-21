@@ -1,6 +1,4 @@
-﻿using Gustnado.RestSharp;
-
-namespace Gustnado.Endpoints
+﻿namespace Gustnado.Endpoints
 {
     public static class SoundCloudApi
     {
@@ -11,6 +9,6 @@ namespace Gustnado.Endpoints
         public static CommentsEndpoint Comments { get; } = new CommentsEndpoint();
         public static MeEndpoint Me { get; } = new MeEndpoint();
         public static AppsEndpoint Apps { get; } = new AppsEndpoint();
-        public static RedirectLocationRequest Resolve(string url) => new RedirectLocationRequest(url);
+        public static ResolveEndpoint Resolve { get; } = new ResolveEndpoint();
     }
 }

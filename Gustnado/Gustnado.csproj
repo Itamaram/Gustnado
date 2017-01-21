@@ -55,6 +55,7 @@
     <Compile Include="Converters\TrackCompactor.cs" />
     <Compile Include="Endpoints\AppsEndpoint.cs" />
     <Compile Include="Endpoints\CommentsEndpoint.cs" />
+    <Compile Include="Endpoints\ResolveEndpoint.cs" />
     <Compile Include="Enums\EmbeddableBy.cs" />
     <Compile Include="Enums\EncodingState.cs" />
     <Compile Include="Enums\License.cs" />
@@ -84,7 +85,6 @@
     <Compile Include="Endpoints\UsersEndpoint.cs" />
     <Compile Include="RestSharp\GustnadoRestClient.cs" />
     <Compile Include="RestSharp\JsonNetDeserialiser.cs" />
-    <Compile Include="RestSharp\RedirectLocationRequest.cs" />
     <Compile Include="RestSharp\RestRequest.cs" />
     <Compile Include="RestSharp\RestRequestMany.cs" />
     <Compile Include="RestSharp\SoundCloudRestRequest.cs" />
