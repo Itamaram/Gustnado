@@ -77,7 +77,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"all", "me", or "none"</example>
         [JsonProperty("embeddable_by")]
-        public string EmbeddableBy { get; set; } //todo enum
+        public EmbeddableBy? EmbeddableBy { get; set; }
 
         /// <summary>
         /// external purchase link

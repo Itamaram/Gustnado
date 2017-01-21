@@ -18,7 +18,7 @@ namespace Gustnado.Extensions
         public static Option<A> GetCustomAttribute<A>(this Type type) where A : Attribute
         {
             return type.GetCustomAttributes()
-                .Select(a => OptionExtensions.MaybeCast<A>(a))
+                .Select(a => a.MaybeCast<A>())
                 .ConcatOptions()
                 .FirstOrNone();
         }

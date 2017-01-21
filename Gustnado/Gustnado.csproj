@@ -55,6 +55,7 @@
     <Compile Include="Converters\TrackCompactor.cs" />
     <Compile Include="Endpoints\AppsEndpoint.cs" />
     <Compile Include="Endpoints\CommentsEndpoint.cs" />
+    <Compile Include="Enums\EmbeddableBy.cs" />
     <Compile Include="Enums\EncodingState.cs" />
     <Compile Include="Enums\License.cs" />
     <Compile Include="Enums\PlaylistType.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="Enums\TrackVisibility.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\OptionsExtensions.cs" />
-    <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Objects\App.cs" />
