@@ -120,6 +120,8 @@ namespace Gustnado
             r.AddQueryParameter("client_id", clientId);
             return r;
         }
+
+        public T Execute<T>(SoundCloudRestRequest<T> request) => request.Execute(this);
     }
 
     public class GustnadoRestClient : RestClient
