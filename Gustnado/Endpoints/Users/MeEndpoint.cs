@@ -15,7 +15,7 @@ namespace Gustnado.Endpoints.Users
         public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(context);
         public FollowingsEndpoint Followings => new FollowingsEndpoint(context);
         public FollowersEndpoint Followers => new FollowersEndpoint(context);
-        public CommentsEndpoint Comments => new CommentsEndpoint(context);
+        public UserCommentsEndpoint Comments => new UserCommentsEndpoint(context);
         public FavoritesEndpoint Favorites => new FavoritesEndpoint(context);
         public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint(context);
 
