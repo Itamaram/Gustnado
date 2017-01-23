@@ -5,19 +5,13 @@ using Newtonsoft.Json;
 
 namespace Gustnado.Endpoints
 {
-    public class MeEndpoint
+    public class MeEndpoint : ReadOnlyUserEndpoint
     {
-        private static readonly SearchContext context = new SearchContext("me");
-
-        public RestRequest<Me> Get() => RestRequest<Me>.Get(context);
-
-        public UserTracksEndpoint Tracks => new UserTracksEndpoint(context);
-        public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(context);
-        public FollowingsEndpoint Followings => new FollowingsEndpoint(context);
-        public FollowersEndpoint Followers => new FollowersEndpoint(context);
-        public UserCommentsEndpoint Comments => new UserCommentsEndpoint(context);
-        public FavoritesEndpoint Favorites => new FavoritesEndpoint(context);
-        public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint(context);
+        public MeEndpoint() : base(new SearchContext("me")) { }
+        
+        public new ReadWriteFollowingsEndpoint Followings => new ReadWriteFollowingsEndpoint(Context);
+        public new ReadWriteFavoritesEndpoint Favorites => new ReadWriteFavoritesEndpoint(Context);
+        public new ReadWriteWebProfilesEndpoint WebProfiles => new ReadWriteWebProfilesEndpoint(Context);
 
         //todo activities
     }
@@ -51,7 +45,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add(id);
         }
 
-        public RestRequest<Connection> Get() => RestRequest<Connection>.Get(context); 
+        public RestRequest<Connection> Get() => RestRequest<Connection>.Get(context);
     }
 
     public class NewConnectionRequest
