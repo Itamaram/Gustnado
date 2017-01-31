@@ -16,7 +16,7 @@ namespace Gustnado.RestSharp
             this.limit = limit;
         }
 
-        public static RestRequestMany<T> Get(SearchContext context, int limit = 50)
+        public static RestRequestMany<T> Get(SearchContext context, int limit)
         {
             return new RestRequestMany<T>(context, limit);
         }

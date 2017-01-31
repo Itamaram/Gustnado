@@ -25,7 +25,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("connections");
         }
 
-        public RestRequestMany<Connection> Get() => RestRequestMany<Connection>.Get(context);
+        public RestRequestMany<Connection> Get(int pagesize = 50) => RestRequestMany<Connection>.Get(context, pagesize);
 
         public RestRequest<NewConnectionResponse> Post(NewConnectionRequest request)
         {

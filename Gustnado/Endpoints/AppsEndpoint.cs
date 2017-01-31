@@ -7,7 +7,7 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("apps");
 
-        public RestRequestMany<App> Get() => RestRequestMany<App>.Get(context);
+        public RestRequestMany<App> Get(int pagesize = 50) => RestRequestMany<App>.Get(context, pagesize);
         
         public AppEndpoint this[int id] => new AppEndpoint(context, id);
     }

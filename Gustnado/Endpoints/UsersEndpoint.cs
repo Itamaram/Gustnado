@@ -9,11 +9,11 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("users");
 
-        public RestRequestMany<User> Get() => Get(Option<string>.None);
+        public RestRequestMany<User> Get(int pagesize = 50) => Get(Option<string>.None, pagesize);
 
-        public RestRequestMany<User> Get(Option<string> q)
+        public RestRequestMany<User> Get(Option<string> q, int pagesize = 50)
         {
-            return RestRequestMany<User>.Get(context)
+            return RestRequestMany<User>.Get(context, pagesize)
                 .AddQueryParameter("q", q);
         }
 
@@ -57,7 +57,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("tracks");
         }
 
-        public RestRequestMany<Track> Get() => RestRequestMany<Track>.Get(context);
+        public RestRequestMany<Track> Get(int pagesize = 50) => RestRequestMany<Track>.Get(context, pagesize);
     }
 
     public class UserPlaylistsEndpoint
@@ -69,7 +69,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("playlists");
         }
 
-        public RestRequestMany<Playlist> Get() => RestRequestMany<Playlist>.Get(context);
+        public RestRequestMany<Playlist> Get(int pagesize = 50) => RestRequestMany<Playlist>.Get(context, pagesize);
     }
 
     public class ReadOnlyFollowingsEndpoint
@@ -81,7 +81,7 @@ namespace Gustnado.Endpoints
             Context = context.Add("followings");
         }
 
-        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(Context);
+        public RestRequestMany<User> Get(int pagesize = 50) => RestRequestMany<User>.Get(Context, pagesize);
 
         public ReadOnlyUserFollowingEndpoint this[int id] => new ReadOnlyUserFollowingEndpoint(Context, id);
     }
@@ -125,7 +125,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("followers");
         }
 
-        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(context);
+        public RestRequestMany<User> Get(int pagesize = 50) => RestRequestMany<User>.Get(context, pagesize);
 
         public FollowerEndpoint this[int id] => new FollowerEndpoint(context, id);
     }
@@ -151,7 +151,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("comments");
         }
 
-        public RestRequestMany<Comment> Get() => RestRequestMany<Comment>.Get(context);
+        public RestRequestMany<Comment> Get(int pagesize = 50) => RestRequestMany<Comment>.Get(context, pagesize);
     }
 
     public class ReadOnlyFavoritesEndpoint
@@ -163,7 +163,7 @@ namespace Gustnado.Endpoints
             Context = context.Add("favorites");
         }
 
-        public RestRequestMany<Track> Get() => RestRequestMany<Track>.Get(Context);
+        public RestRequestMany<Track> Get(int pagesize = 50) => RestRequestMany<Track>.Get(Context, pagesize);
 
         public ReadOnlyFavoriteEndpoint this[int id] => new ReadOnlyFavoriteEndpoint(Context, id);
     }
@@ -209,7 +209,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("web-profiles");
         }
 
-        public RestRequestMany<WebProfile> Get() => RestRequestMany<WebProfile>.Get(context);
+        public RestRequestMany<WebProfile> Get(int pagesize = 50) => RestRequestMany<WebProfile>.Get(context, pagesize);
     }
 
     public class ReadWriteWebProfilesEndpoint : ReadOnlyWebProfilesEndpoint

@@ -7,7 +7,7 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("comments");
 
-        public RestRequestMany<Comment> Get() => RestRequestMany<Comment>.Get(context);
+        public RestRequestMany<Comment> Get(int pagesize = 50) => RestRequestMany<Comment>.Get(context, pagesize);
         
         public CommentEndpoint this[int id] => new CommentEndpoint(context, id);
     }

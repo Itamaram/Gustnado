@@ -19,5 +19,10 @@ namespace Gustnado.Extensions
         {
             return new Uri(url).PathAndQuery;
         }
+
+        public static bool Contains(this string haystack, string needle, StringComparison comparer)
+        {
+            return haystack != null && haystack.IndexOf(needle, comparer) >= 0;
+        }
     }
 }

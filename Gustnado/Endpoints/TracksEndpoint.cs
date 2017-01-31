@@ -13,14 +13,14 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("tracks");
 
-        public RestRequestMany<Track> Get()
+        public RestRequestMany<Track> Get(int pagesize = 50)
         {
-            return RestRequestMany<Track>.Get(context);
+            return RestRequestMany<Track>.Get(context, pagesize);
         }
 
-        public RestRequestMany<Track> Get(TracksRequestFilter filter)
+        public RestRequestMany<Track> Get(TracksRequestFilter filter, int pagesize = 50)
         {
-            return RestRequestMany<Track>.Get(context)
+            return RestRequestMany<Track>.Get(context, pagesize)
                 .WriteToQueryString(filter);
         }
 
@@ -66,9 +66,9 @@ namespace Gustnado.Endpoints
             this.context = context.Add("comments");
         }
 
-        public RestRequestMany<Comment> Get()
+        public RestRequestMany<Comment> Get(int pagesize = 50)
         {
-            return RestRequestMany<Comment>.Get(context);
+            return RestRequestMany<Comment>.Get(context, pagesize);
         }
 
         public RestRequest<Comment> Put(Comment comment)
@@ -109,7 +109,7 @@ namespace Gustnado.Endpoints
             this.context = context.Add("favoriters");
         }
 
-        public RestRequestMany<User> Get() => RestRequestMany<User>.Get(context);
+        public RestRequestMany<User> Get(int pagesize = 50) => RestRequestMany<User>.Get(context, pagesize);
 
         public TrackFavoriterEndpoint this[int id] => new TrackFavoriterEndpoint(context, id);
     }

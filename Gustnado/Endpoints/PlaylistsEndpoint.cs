@@ -10,13 +10,13 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("playlists");
 
-        public RestRequestMany<Playlist> Get(PlaylistsFilters filters)
+        public RestRequestMany<Playlist> Get(PlaylistsFilters filters, int pagesize = 50)
         {
-            return RestRequestMany<Playlist>.Get(context)
+            return RestRequestMany<Playlist>.Get(context, pagesize)
                 .WriteToQueryString(filters);
         }
 
-        public RestRequestMany<Playlist> Get() => RestRequestMany<Playlist>.Get(context);
+        public RestRequestMany<Playlist> Get(int pagesize = 50) => RestRequestMany<Playlist>.Get(context, pagesize);
 
         public RestRequest<Playlist> Put(Playlist playlist)
         {

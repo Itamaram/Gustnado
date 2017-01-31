@@ -9,6 +9,6 @@ namespace Gustnado.Tests
         public static string Username { get; } = Get("Sharknado.Tests.Username");
         public static string Password { get; } = Get("Sharknado.Tests.Password");
 
-        private static string Get(string variable) => Environment.GetEnvironmentVariable(variable);
+        private static string Get(string variable) => Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Machine);
     }
 }

@@ -1,6 +1,6 @@
 @echo off
 
-setx Sharknado.Tests.ClientId ######
-setx Sharknado.Tests.ClientSecret ######
-setx Sharknado.Tests.Username ######
-setx Sharknado.Tests.Password ######
+setx /m Sharknado.Tests.ClientId ######
+setx /m Sharknado.Tests.ClientSecret ######
+setx /m Sharknado.Tests.Username ######
+setx /m Sharknado.Tests.Password ######
