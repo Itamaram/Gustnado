@@ -184,13 +184,13 @@ namespace Gustnado.Endpoints
         /// return tracks with at least this bpm value
         ///</summary>
         [JsonProperty("bpm[from]")]
-        public int? BpmFrom { get; set; }
+        public double? BpmFrom { get; set; }
 
         /// <summary>
         /// return tracks with at most this bpm value
         ///</summary>
         [JsonProperty("bpm[to]")]
-        public int? BpmTo { get; set; }
+        public double? BpmTo { get; set; }
 
         /// <summary>
         /// return tracks with at least this duration (in millis)

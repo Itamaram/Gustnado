@@ -9,16 +9,6 @@ using Gustnado.Extensions;
 
 namespace Gustnado.Tests.Endpoints
 {
-    public class RequestManyTests
-    {
-        public void PaginationTest()
-        {
-            var users = SoundCloudApi.Users.Get(10).Execute(new TestClient()).Take(31).ToList();
-            Assert.AreEqual(31, users.Count);
-            CollectionAssert.AllItemsAreNotNull(users);
-        }
-    }
-
     public class UsersEndpointTests
     {
         private static readonly SoundCloudHttpClient client = new TestClient();

@@ -43,6 +43,12 @@ namespace Gustnado.Serialisation
             base.WriteValue(value);
         }
 
+        public override void WriteValue(double value)
+        {
+            Write(value);
+            base.WriteValue(value);
+        }
+
         public void WriteFile(string path)
         {
             Request.AddFile(key, path);

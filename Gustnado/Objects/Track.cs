@@ -71,14 +71,14 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"public"</example>
         [JsonProperty("sharing")]
-        public string Sharing { get; set; } //todo enum?
+        public TrackVisibility? Sharing { get; set; }
 
         /// <summary>
         /// who can embed this track or playlist
         /// </summary>
         /// <example>"all", "me", or "none"</example>
         [JsonProperty("embeddable_by")]
-        public string EmbeddableBy { get; set; } //todo enum?
+        public EmbeddableBy EmbeddableBy { get; set; }
 
         /// <summary>
         /// external purchase link
@@ -239,7 +239,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>120</example>
         [JsonProperty("bpm")]
-        public int? BPM { get; set; }
+        public double? BPM { get; set; }
 
         /// <summary>
         /// track commentable (boolean)

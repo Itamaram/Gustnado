@@ -71,6 +71,9 @@
     <Compile Include="Converters\DateTimeFormatterTests.cs" />
     <Compile Include="Converters\EnumConverterTests.cs" />
     <Compile Include="Converters\TrackCompactorTests.cs" />
+    <Compile Include="Endpoints\PlaylistsEndpointTests.cs" />
+    <Compile Include="Endpoints\RequestManyTests.cs" />
+    <Compile Include="Endpoints\TracksEndpointTests.cs" />
     <Compile Include="Endpoints\UsersEndpointTests.cs" />
     <Compile Include="EnvironmentVariables.cs" />
     <Compile Include="Objects\SerialisationTests.cs" />
