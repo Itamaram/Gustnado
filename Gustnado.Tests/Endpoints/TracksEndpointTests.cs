@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Gustnado.Endpoints;
@@ -12,267 +11,156 @@ namespace Gustnado.Tests.Endpoints
 {
     public class TracksEndpointTests
     {
-        [TestCaseSource(nameof(tests))]
-        public void TrackSearch(Constraint[] constraints)
+        private static List<Track> ExecuteSearch(TracksRequestFilter filter)
         {
-            var filter = constraints.Aggregate(new TracksRequestFilter(), (f, c) =>
-            {
-                c.Poke(f);
-                return f;
-            });
-
-            var tracks = SoundCloudApi.Tracks.Get(filter).Execute(new TestClient()).Take(50).ToList();
-
-            CollectionAssert.IsNotEmpty(tracks);
-
-            foreach (var track in tracks)
-                foreach (var constraint in constraints)
-                    constraint.AssertTrack(track);
+            return SoundCloudApi.Tracks.Get(filter, 20).Execute(new TestClient()).Take(20).ToList();
         }
 
-        private static readonly IEnumerable tests = new object[]
+        [TestCase("best")]
+        public void FilterQ(string q)
         {
-            new Constraint[] {new Query("best")},
-            new Constraint[] {new Tags("chill")},
-            new Constraint[] {new Tags("chill", "dope")},
-            new Constraint[] {new Filter(TrackVisibility.All)},
-            new Constraint[] {new Filter(TrackVisibility.Public)},
-            //new Constraint[] {new Filter(TrackVisibility.Private)}, obviously returns nothing
-            //new Constraint[] {new LicenseConstraint(License.AllRightsReserved)}, SC API bug
-            new Constraint[] {new LicenseConstraint(License.AttributionShareAlike)},
-            new Constraint[] {new LicenseConstraint(License.Attribution)},
-            new Constraint[] {new LicenseConstraint(License.AttributionNoDerivatives)},
-            //new Constraint[] {new LicenseConstraint(License.AttributionNonCommercial)}, SC API bug
-            new Constraint[] {new LicenseConstraint(License.AttributionNonCommercialNoDerivatives)},
-            new Constraint[] {new LicenseConstraint(License.AttributionNonCommercialShareAlike)},
-            //new Constraint[] {new LicenseConstraint(License.NoRightsReserved)}, SC API bug
-            new Constraint[] {new BpmMin(120)},
-            new Constraint[] {new BpmMax(60)},
-            new Constraint[] {new DurationMin(60*60*1000)},
-            new Constraint[] {new DurationMax(5*1000)},
-            new Constraint[] {new CreatedFrom(DateTime.Now.AddDays(-1))},
-            new Constraint[] {new CreatedBy(DateTime.Now.AddYears(-1))}
-        };
-    }
-
-    public interface Constraint
-    {
-        void AssertTrack(Track track);
-        void Poke(TracksRequestFilter filter);
-    }
-
-    public class Query : Constraint
-    {
-        private readonly string q;
-
-        public Query(string q)
-        {
-            this.q = q;
+            ExecuteSearch(new TracksRequestFilter { Q = q })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track =>
+                {
+                    var fields = track.GetAllStringPropertiesValues().Concat(track.User.GetAllStringPropertiesValues());
+                    StringAssert.Contains(q, fields);
+                });
         }
 
-        public void AssertTrack(Track track)
+        [TestCase("edm")]
+        [TestCase("chill", "dope")]
+        public void FilterTags(params string[] tags)
         {
-            track.GetAllStringPropertiesValues().Concat(track.User.GetAllStringPropertiesValues())
-                .Do(props => StringAssert.Contains(q, props));
+            ExecuteSearch(new TracksRequestFilter { Tags = tags.ToList() })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track =>
+                {
+                    Assert.True(tags.Any(t => track.Tags.Contains(t, StringComparison.OrdinalIgnoreCase)),
+                        $"'{track.Tags}' did not contain any of '{string.Join(", ", tags)}'");
+                });
         }
 
-        public void Poke(TracksRequestFilter filter) => filter.Q = q;
-    }
-
-    public class Tags : Constraint
-    {
-        private readonly IEnumerable<string> tags;
-
-        public Tags(params string[] tags)
+        [TestCase(TrackVisibility.All)]
+        [TestCase(TrackVisibility.Public)]
+        public void FilterFilter(TrackVisibility visibility)
         {
-            this.tags = tags;
+            ExecuteSearch(new TracksRequestFilter { Filter = visibility })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.AreEqual(TrackVisibility.Public, track.Sharing));
         }
 
-        public void AssertTrack(Track track)
+        //todo: Add a less silly test which includes auth and an actually private track
+        [Test]
+        public void FilterPrivate()
         {
-            Assert.True(tags.Any(t => track.Tags.Contains(t, StringComparison.OrdinalIgnoreCase)),
-                $"'{track.Tags}' did not contain any of '{string.Join(", ", tags)}'");
+            ExecuteSearch(new TracksRequestFilter { Filter = TrackVisibility.Private })
+                .Do(CollectionAssert.IsEmpty);
         }
 
-        public void Poke(TracksRequestFilter filter) => filter.Tags = tags.ToList();
-    }
-
-    public class Filter : Constraint
-    {
-        private readonly TrackVisibility visibility;
-
-        public Filter(TrackVisibility visibility)
+        //bug? SC API seems to return nothing for the commented out values
+        //[TestCase(License.NoRightsReserved)]
+        //[TestCase(License.AllRightsReserved)]
+        //[TestCase(License.AttributionNonCommercial)]
+        [TestCase(License.Attribution)]
+        [TestCase(License.AttributionNoDerivatives)]
+        [TestCase(License.AttributionShareAlike)]
+        [TestCase(License.AttributionNonCommercialNoDerivatives)]
+        [TestCase(License.AttributionNonCommercialShareAlike)]
+        public void FilterLicense(License license)
         {
-            this.visibility = visibility;
+            ExecuteSearch(new TracksRequestFilter { License = license })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.AreEqual(license, track.License));
         }
 
-        public void AssertTrack(Track track)
+        [TestCase(120)]
+        public void FilterBpmMin(int min)
         {
-            switch (visibility)
-            {
-                case TrackVisibility.All:
-                    break;
-                case TrackVisibility.Public:
-                case TrackVisibility.Private:
-                    Assert.AreEqual(track.Sharing, visibility);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            ExecuteSearch(new TracksRequestFilter { BpmFrom = min })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.LessOrEqual(min, track.BPM));
         }
 
-        public void Poke(TracksRequestFilter filter) => filter.Filter = visibility;
-    }
-
-    public class LicenseConstraint : Constraint
-    {
-        private readonly License license;
-
-        public LicenseConstraint(License license)
+        [TestCase(60)]
+        public void FilterBpmMax(int max)
         {
-            this.license = license;
+            ExecuteSearch(new TracksRequestFilter { BpmTo = max })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.GreaterOrEqual(max, track.BPM));
         }
 
-        public void AssertTrack(Track track) => Assert.AreEqual(license, track.License);
-
-        public void Poke(TracksRequestFilter filter) => filter.License = license;
-    }
-
-    public class BpmMin : Constraint
-    {
-        private readonly double min;
-
-        public BpmMin(double min)
+        [TestCase(60 * 60 * 1000)]
+        public void FilterDurationMin(int min)
         {
-            this.min = min;
+            ExecuteSearch(new TracksRequestFilter { DurationFrom = min })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.LessOrEqual(min, track.Duration));
         }
 
-        public void AssertTrack(Track track) => Assert.GreaterOrEqual(track.BPM, min);
-
-        public void Poke(TracksRequestFilter filter) => filter.BpmFrom = min;
-    }
-
-    public class BpmMax : Constraint
-    {
-        private readonly double max;
-
-        public BpmMax(double max)
+        [TestCase(5 * 1000)]
+        public void FilterDurationMax(int max)
         {
-            this.max = max;
+            ExecuteSearch(new TracksRequestFilter { DurationTo = max })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.GreaterOrEqual(max, track.Duration));
         }
 
-        public void AssertTrack(Track track) => Assert.GreaterOrEqual(track.BPM, max);
-
-        public void Poke(TracksRequestFilter filter) => filter.BpmFrom = max;
-    }
-
-    public class DurationMin : Constraint
-    {
-        private readonly int min;
-
-        public DurationMin(int min)
+        [TestCase("1.00:00:00")]
+        public void FilterCreatedAtFrom(string span)
         {
-            this.min = min;
+            var min = DateTime.Now - TimeSpan.Parse(span);
+
+            ExecuteSearch(new TracksRequestFilter { CreateAtFrom = min })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.LessOrEqual(min, track.CreatedAt));
         }
 
-        public void AssertTrack(Track track) => Assert.GreaterOrEqual(track.Duration, min);
-
-        public void Poke(TracksRequestFilter filter) => filter.DurationFrom = min;
-    }
-
-    public class DurationMax : Constraint
-    {
-        private readonly int max;
-
-        public DurationMax(int max)
+        [TestCase("365.00:00:00")]
+        public void FilterDurationTo(string span)
         {
-            this.max = max;
+            var max = DateTime.Now - TimeSpan.Parse(span);
+
+            ExecuteSearch(new TracksRequestFilter { CreatedAtTo = max })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => Assert.GreaterOrEqual(max, track.CreatedAt));
         }
 
-        public void AssertTrack(Track track) => Assert.LessOrEqual(track.Duration, max);
-
-        public void Poke(TracksRequestFilter filter) => filter.DurationTo = max;
-    }
-
-    public class CreatedFrom : Constraint
-    {
-        private readonly DateTime from;
-
-        public CreatedFrom(DateTime from)
+        [TestCase(215615250)]
+        public void FilterIds(params int[] ids)
         {
-            this.from = from;
+            ExecuteSearch(new TracksRequestFilter { Ids = ids.ToList() })
+                .Do(tracks => CollectionAssert.AreEquivalent(ids, tracks.Select(t => t.Id)));
         }
 
-        public void AssertTrack(Track track) => Assert.LessOrEqual(from, track.CreatedAt);
-
-        public void Poke(TracksRequestFilter filter) => filter.CreateAtFrom = from;
-    }
-
-    public class CreatedBy : Constraint
-    {
-        private readonly DateTime to;
-
-        public CreatedBy(DateTime to)
+        [TestCase("edm")]
+        //[TestCase("rap", "hiphop")] bug: Another SC API documentation lie?
+        public void FilterGenres(params string[] genres)
         {
-            this.to = to;
+            ExecuteSearch(new TracksRequestFilter { Genres = genres.ToList() })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => StringAssert.Contains(track.Genre, genres));
         }
 
-        public void AssertTrack(Track track) => Assert.GreaterOrEqual(to, track.CreatedAt);
-
-        public void Poke(TracksRequestFilter filter) => filter.CreatedAtTo = to;
-    }
-
-    public class Ids : Constraint
-    {
-        private readonly IEnumerable<int> ids;
-
-        public Ids(params int[] ids)
+        [TestCase(TrackType.Original)]
+        [TestCase(TrackType.Remix)]
+        [TestCase(TrackType.Live)]
+        [TestCase(TrackType.Recording)]
+        //[TestCase(TrackType.Spoken)] bug: spoken can sometimes return tracks with type property set to null :/
+        [TestCase(TrackType.Podcast)]
+        [TestCase(TrackType.Demo)]
+        [TestCase(TrackType.InProgress)]
+        //[TestCase(TrackType.Stem)]
+        [TestCase(TrackType.Loop)]
+        //[TestCase(TrackType.SoundEffect)]
+        //[TestCase(TrackType.Sample)] bug: not actually recognized by server 503 yo
+        [TestCase(TrackType.Other)]
+        [TestCase(TrackType.Original, TrackType.Recording)]
+        public void FilterTypes(params TrackType[] types)
         {
-            this.ids = ids;
-        }
-
-        public void AssertTrack(Track track) => CollectionAssert.Contains(ids, track.Id);
-
-        public void Poke(TracksRequestFilter filter) => filter.Ids = ids.ToList();
-    }
-
-    public class Genres : Constraint
-    {
-        private readonly IEnumerable<string> genres;
-
-        public Genres(params string[] genres)
-        {
-            this.genres = genres;
-        }
-
-        public void AssertTrack(Track track)
-        {
-            StringAssert.Contains(track.Genre, genres);
-        }
-
-        public void Poke(TracksRequestFilter filter)
-        {
-            filter.Genres = genres.ToList();
-        }
-    }
-
-    public class Types : Constraint
-    {
-        private readonly IEnumerable<TrackType> types;
-
-        public Types(params TrackType[] types)
-        {
-            this.types = types;
-        }
-
-        public void AssertTrack(Track track)
-        {
-            CollectionAssert.Contains(types, track.TrackType);
-        }
-
-        public void Poke(TracksRequestFilter filter)
-        {
-            filter.Types = types.ToList();
+            ExecuteSearch(new TracksRequestFilter { Types = types.ToList() })
+                .Do(CollectionAssert.IsNotEmpty)
+                .ForEach(track => CollectionAssert.Contains(types, track.TrackType));
         }
     }
 }

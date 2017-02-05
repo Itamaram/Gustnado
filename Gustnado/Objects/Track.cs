@@ -78,7 +78,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>"all", "me", or "none"</example>
         [JsonProperty("embeddable_by")]
-        public EmbeddableBy EmbeddableBy { get; set; }
+        public EmbeddableBy? EmbeddableBy { get; set; }
 
         /// <summary>
         /// external purchase link
@@ -147,8 +147,9 @@ namespace Gustnado.Objects
         /// release number
         /// </summary>
         /// <example>3234</example>
+        /// <example>WCLR0092</example>
         [JsonProperty("release")]
-        public int? Release { get; set; }
+        public string Release { get; set; }
 
         /// <summary>
         /// day of the release
