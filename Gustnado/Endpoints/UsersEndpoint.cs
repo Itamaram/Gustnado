@@ -20,34 +20,26 @@ namespace Gustnado.Endpoints
         public UserEndpoint this[int id] => new UserEndpoint(context, id);
     }
 
-    public abstract class ReadOnlyUserEndpoint
+    public class UserEndpoint
     {
-        protected SearchContext Context { get; set; }
+        private readonly SearchContext context;
 
-        protected ReadOnlyUserEndpoint(SearchContext context)
-        {
-            Context = context;
-        }
-
-        public RestRequest<User> Get() => RestRequest<User>.Get(Context);
-
-        public UserTracksEndpoint Tracks => new UserTracksEndpoint(Context);
-        public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(Context);
-        public ReadOnlyFollowingsEndpoint Followings => new ReadOnlyFollowingsEndpoint(Context);
-        public FollowersEndpoint Followers => new FollowersEndpoint(Context);
-        public UserCommentsEndpoint Comments => new UserCommentsEndpoint(Context);
-        public ReadOnlyFavoritesEndpoint Favorites => new ReadOnlyFavoritesEndpoint(Context);
-        public ReadOnlyWebProfilesEndpoint WebProfiles => new ReadOnlyWebProfilesEndpoint(Context);
-    }
-
-    public class UserEndpoint : ReadOnlyUserEndpoint
-    {
         public UserEndpoint(SearchContext context, int id)
-            : base(context.Add(id))
         {
+            this.context = context.Add(id);
         }
-    }
 
+        public RestRequest<User> Get() => RestRequest<User>.Get(context);
+
+        public UserTracksEndpoint Tracks => new UserTracksEndpoint(context);
+        public UserPlaylistsEndpoint Playlists => new UserPlaylistsEndpoint(context);
+        public FollowingsEndpoint Followings => new FollowingsEndpoint( context);
+        public FollowersEndpoint Followers => new FollowersEndpoint( context);
+        public UserCommentsEndpoint Comments => new UserCommentsEndpoint( context);
+        public FavoritesEndpoint Favorites => new FavoritesEndpoint( context);
+        public WebProfilesEndpoint WebProfiles => new WebProfilesEndpoint( context);
+    }
+    
     public class UserTracksEndpoint
     {
         private readonly SearchContext context;
@@ -59,7 +51,7 @@ namespace Gustnado.Endpoints
 
         public RestRequestMany<Track> Get(int pagesize = 50) => RestRequestMany<Track>.Get(context, pagesize);
     }
-
+    
     public class UserPlaylistsEndpoint
     {
         private readonly SearchContext context;
@@ -72,48 +64,34 @@ namespace Gustnado.Endpoints
         public RestRequestMany<Playlist> Get(int pagesize = 50) => RestRequestMany<Playlist>.Get(context, pagesize);
     }
 
-    public class ReadOnlyFollowingsEndpoint
+    public class FollowingsEndpoint
     {
-        protected SearchContext Context { get; }
+        private readonly SearchContext context;
 
-        public ReadOnlyFollowingsEndpoint(SearchContext context)
+        public FollowingsEndpoint(SearchContext context)
         {
-            Context = context.Add("followings");
+            this.context = context.Add("followings");
         }
 
-        public RestRequestMany<User> Get(int pagesize = 50) => RestRequestMany<User>.Get(Context, pagesize);
+        public RestRequestMany<User> Get(int pagesize = 50) => RestRequestMany<User>.Get(context, pagesize);
 
-        public ReadOnlyUserFollowingEndpoint this[int id] => new ReadOnlyUserFollowingEndpoint(Context, id);
+        public UserFollowingEndpoint this[int id] => new UserFollowingEndpoint(context, id);
     }
 
-    public class ReadWriteFollowingsEndpoint : ReadOnlyFollowingsEndpoint
+    public class UserFollowingEndpoint
     {
-        public ReadWriteFollowingsEndpoint(SearchContext context) : base(context)
+        private readonly SearchContext context;
+
+        public UserFollowingEndpoint(SearchContext context, int id)
         {
+            this.context = context.Add(id);
         }
 
-        public new ReadWriteUserFollowingEndpoint this[int id] => new ReadWriteUserFollowingEndpoint(Context, id);
-    }
+        public RestRequest<User> Get() => RestRequest<User>.Get(context);
 
-    public class ReadOnlyUserFollowingEndpoint
-    {
-        protected SearchContext Context { get; }
+        public RestRequest<DeleteResponse> Put() => RestRequest<DeleteResponse>.Put(context);
 
-        public ReadOnlyUserFollowingEndpoint(SearchContext context, int id)
-        {
-            Context = context.Add(id);
-        }
-
-        public RestRequest<User> Get() => RestRequest<User>.Get(Context);
-    }
-
-    public class ReadWriteUserFollowingEndpoint : ReadOnlyUserFollowingEndpoint
-    {
-        public ReadWriteUserFollowingEndpoint(SearchContext context, int id) : base(context, id) { }
-
-        public RestRequest<DeleteResponse> Put() => RestRequest<DeleteResponse>.Put(Context);
-
-        public RestRequest<User> Delete() => RestRequest<User>.Delete(Context);
+        public RestRequest<User> Delete() => RestRequest<User>.Delete(context);
     }
 
     public class FollowersEndpoint
@@ -141,7 +119,7 @@ namespace Gustnado.Endpoints
 
         public RestRequest<User> Get() => RestRequest<User>.Get(context);
     }
-
+    
     public class UserCommentsEndpoint
     {
         private readonly SearchContext context;
@@ -153,70 +131,47 @@ namespace Gustnado.Endpoints
 
         public RestRequestMany<Comment> Get(int pagesize = 50) => RestRequestMany<Comment>.Get(context, pagesize);
     }
-
-    public class ReadOnlyFavoritesEndpoint
-    {
-        protected SearchContext Context { get; }
-
-        public ReadOnlyFavoritesEndpoint(SearchContext context)
-        {
-            Context = context.Add("favorites");
-        }
-
-        public RestRequestMany<Track> Get(int pagesize = 50) => RestRequestMany<Track>.Get(Context, pagesize);
-
-        public ReadOnlyFavoriteEndpoint this[int id] => new ReadOnlyFavoriteEndpoint(Context, id);
-    }
-
-    public class ReadOnlyFavoriteEndpoint
-    {
-        protected SearchContext Context { get; }
-
-        public ReadOnlyFavoriteEndpoint(SearchContext context, int id)
-        {
-            Context = context.Add(id);
-        }
-
-        public RestRequest<Track> Get() => RestRequest<Track>.Get(Context);
-    }
-
-    public class ReadWriteFavoritesEndpoint : ReadOnlyFavoritesEndpoint
-    {
-        public ReadWriteFavoritesEndpoint(SearchContext context) : base(context)
-        {
-        }
-
-        public new ReadWriteFavoriteEndpoint this[int id] => new ReadWriteFavoriteEndpoint(Context, id);
-    }
-
-    public class ReadWriteFavoriteEndpoint : ReadOnlyFavoriteEndpoint
-    {
-        public ReadWriteFavoriteEndpoint(SearchContext context, int id) : base(context, id)
-        {
-        }
-
-        public RestRequest<Track> Put() => RestRequest<Track>.Put(Context);
-
-        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(Context);
-    }
-
-    public class ReadOnlyWebProfilesEndpoint
+    
+    public class FavoritesEndpoint
     {
         private readonly SearchContext context;
 
-        public ReadOnlyWebProfilesEndpoint(SearchContext context)
+        public FavoritesEndpoint(SearchContext context)
+        {
+            this.context = context.Add("favorites");
+        }
+
+        public RestRequestMany<Track> Get(int pagesize = 50) => RestRequestMany<Track>.Get(context, pagesize);
+
+        public FavoriteEndpoint this[int id] => new FavoriteEndpoint(context,id);
+    }
+
+    public class FavoriteEndpoint
+    {
+        private readonly SearchContext context;
+
+        public FavoriteEndpoint(SearchContext context, int id)
+        {
+            this.context = context.Add(id);
+        }
+
+        public RestRequest<Track> Get() => RestRequest<Track>.Get(context);
+
+        public RestRequest<Track> Put() => RestRequest<Track>.Put(context);
+        
+        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context); 
+    }
+
+    public class WebProfilesEndpoint 
+    {
+        private readonly SearchContext context;
+
+        public WebProfilesEndpoint(SearchContext context)
         {
             this.context = context.Add("web-profiles");
         }
 
         public RestRequestMany<WebProfile> Get(int pagesize = 50) => RestRequestMany<WebProfile>.Get(context, pagesize);
-    }
-
-    public class ReadWriteWebProfilesEndpoint : ReadOnlyWebProfilesEndpoint
-    {
-        public ReadWriteWebProfilesEndpoint(SearchContext context) : base(context)
-        {
-        }
 
         //todo PUT DELETE
     }
