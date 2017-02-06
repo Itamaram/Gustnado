@@ -147,7 +147,7 @@ namespace Gustnado.Objects
         /// </summary>
         /// <example>3234</example>
         [JsonProperty("release")]
-        public int? Release { get; set; }
+        public string Release { get; set; }
 
         /// <summary>
         /// day of the release

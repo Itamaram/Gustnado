@@ -10,13 +10,25 @@ namespace Gustnado.Endpoints
     {
         private static readonly SearchContext context = new SearchContext("playlists");
 
-        public RestRequestMany<Playlist> Get(PlaylistsFilters filters, int pagesize = 50)
+        public RestRequestMany<Playlist> Get(int pagesize = 50) => RestRequestMany<Playlist>.Get(context, pagesize);
+
+        public RestRequestMany<Playlist> Get(PlaylistRepresentation representation, int pagesize = 50)
+        {
+            return Get(new PlaylistsFilters { Representation = representation }, pagesize);
+        }
+
+        public RestRequestMany<Playlist> Get(string q, int pagesize = 50)
+        {
+            return Get(new PlaylistsFilters { Q = q }, pagesize);
+        }
+
+        private static RestRequestMany<Playlist> Get(PlaylistsFilters filters, int pagesize)
         {
             return RestRequestMany<Playlist>.Get(context, pagesize)
                 .WriteToQueryString(filters);
         }
 
-        public RestRequestMany<Playlist> Get(int pagesize = 50) => RestRequestMany<Playlist>.Get(context, pagesize);
+        public PlaylistEndpoint this[int id] => new PlaylistEndpoint(context, id);
 
         public RestRequest<Playlist> Put(Playlist playlist)
         {
@@ -41,6 +53,8 @@ namespace Gustnado.Endpoints
             return RestRequest<Playlist>.Put(context)
                 .AddJsonToRequestBody(playlist);
         }
+
+        //todo secret token
     }
 
     public class PlaylistsFilters

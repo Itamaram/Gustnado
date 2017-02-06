@@ -201,6 +201,8 @@ namespace Gustnado.Tests.Endpoints
             Assert.AreEqual(Constants.ItamarId, favoriter.Id);
         }
 
+        //todo comment on a track goes here. But not uploading or favoriting?
+
         //todo SecretToken. Here? Or only on /Me?
     }
 }

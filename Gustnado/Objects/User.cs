@@ -152,5 +152,7 @@ namespace Gustnado.Objects
         [JsonProperty("avatar_data")]
         [JsonConverter(typeof(AddToRequestBodyAsFile))]
         public string AvatarData { get; set; }
+
+        //todo plan, subscriptions
     }
 }
