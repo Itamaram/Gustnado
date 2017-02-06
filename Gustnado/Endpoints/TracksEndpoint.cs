@@ -138,7 +138,7 @@ namespace Gustnado.Endpoints
         public RestRequest<SecretTokenContainer> Put(string secret)
         {
             return RestRequest<SecretTokenContainer>.Put(contexet)
-                .AddJsonToRequestBody(new SecretTokenContainer { SecretToken = secret });
+                .AddJsonToRequestBody(new SecretTokenContainer { Token = secret });
         }
 
         public RestRequest<SecretTokenContainer> Get()
@@ -147,10 +147,19 @@ namespace Gustnado.Endpoints
         }
     }
 
-    //todo this is probably definitely wrong
     public class SecretTokenContainer
     {
-        public string SecretToken { get; set; }
+        [JsonProperty("kind")]
+        public string Kind { get; set; }
+
+        [JsonProperty("resource_uri")]
+        public string ResourceUri { get; set; }
+
+        [JsonProperty("token")]
+        public string Token { get; set; }
+
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
     }
 
     public class TracksRequestFilter

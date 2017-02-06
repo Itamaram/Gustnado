@@ -33,7 +33,8 @@ namespace Gustnado.RestSharp
             //todo error handling :/
             return this.AddClientId(client)
                 .Authenticate(client)
-                .Map(r => client.Http.Execute<T>(r).Data);
+                .Map(r => client.Http.Execute<T>(r))
+                .Map(r => r.Data);
         }
     }
 }

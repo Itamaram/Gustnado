@@ -177,6 +177,7 @@ namespace Gustnado.Objects
         /// <remarks>This will aggregate the playlists tracks streamable attribute. Its value will be nil if not all tracks have the same streamable value.</remarks>
         [JsonProperty("streamable")]
         public bool? Streamable { get; set; } //todo custom parser for nil?
+
         /// <summary>
         /// downloadable (boolean)
         /// </summary>
@@ -184,7 +185,7 @@ namespace Gustnado.Objects
         /// <remarks>This will aggregate the playlists tracks downloadable attribute. Its value will be nil if not all tracks have the same downloadable value.</remarks>
         [JsonProperty("downloadable")]
         public bool? Downloadable { get; set; }
-        
+
         /// <summary>
         /// EAN identifier for the playlist
         /// </summary>
@@ -203,5 +204,11 @@ namespace Gustnado.Objects
         [JsonProperty("tracks")]
         [JsonConverter(typeof(TrackCompactor))]
         public List<Track> Tracks { get; set; }
+
+        [JsonProperty("tracks_uri")]
+        public string TracksUri { get; set; }
+
+        [JsonProperty("track_count")]
+        public int? TrackCount { get; set; }
     }
 }
