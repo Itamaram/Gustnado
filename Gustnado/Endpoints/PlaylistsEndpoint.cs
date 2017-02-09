@@ -32,8 +32,8 @@ namespace Gustnado.Endpoints
 
         public RestRequest<Playlist> Create(Playlist playlist)
         {
-            return RestRequest<Playlist>.Put(context)
-                .AddJsonToRequestBody(playlist);
+            return RestRequest<Playlist>.Post(context)
+                .AddJsonToRequestBody(new { playlist = playlist });
         }
     }
 
@@ -50,9 +50,11 @@ namespace Gustnado.Endpoints
 
         public RestRequest<Playlist> Update(Playlist playlist)
         {
-            return RestRequest<Playlist>.Post(context)
-                .AddJsonToRequestBody(playlist);
+            return RestRequest<Playlist>.Put(context)
+                .AddJsonToRequestBody(new { playlist = playlist });
         }
+
+        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context);
 
         //todo secret token
     }

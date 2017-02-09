@@ -34,6 +34,6 @@ namespace Gustnado.Serialisation
         string ISerializer.RootElement { get; set; }
         string ISerializer.Namespace { get; set; }
         string ISerializer.DateFormat { get; set; }
-        public string ContentType { get; set; }
+        public string ContentType { get; set; } = "application/json";
     }
 }
