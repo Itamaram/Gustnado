@@ -72,6 +72,7 @@
     <Compile Include="Converters\EnumConverterTests.cs" />
     <Compile Include="Converters\TrackCompactorTests.cs" />
     <Compile Include="Endpoints\CommentsEndpointTests.cs" />
+    <Compile Include="Endpoints\MeEndpointTests.cs" />
     <Compile Include="Endpoints\PlaylistsEndpointTests.cs" />
     <Compile Include="Endpoints\RequestManyTests.cs" />
     <Compile Include="Endpoints\TracksEndpointTests.cs" />
@@ -88,6 +89,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\soundfile.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

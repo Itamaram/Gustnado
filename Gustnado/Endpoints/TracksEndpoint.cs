@@ -24,9 +24,9 @@ namespace Gustnado.Endpoints
                 .WriteToQueryString(filter);
         }
 
-        public RestRequest<Track> Put(Track track)
+        public RestRequest<Track> Create(Track track)
         {
-            return RestRequest<Track>.Put(context)
+            return RestRequest<Track>.Post(context)
                 .WriteToRequest(track);
         }
 
@@ -44,13 +44,13 @@ namespace Gustnado.Endpoints
 
         public RestRequest<Track> Get() => RestRequest<Track>.Get(context);
 
-        public RestRequest<Track> Put(Track track)
+        public RestRequest<Track> Update(Track track)
         {
             return RestRequest<Track>.Put(context)
                 .WriteToRequest(track);
         }
 
-        public RestRequest<object> Delete() => RestRequest<object>.Delete(context);
+        public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context);
 
         public TrackCommentsEndpoint Comments => new TrackCommentsEndpoint(context);
         public TrackFavoritersEndpoint Favoriters => new TrackFavoritersEndpoint(context);
@@ -71,10 +71,10 @@ namespace Gustnado.Endpoints
             return RestRequestMany<Comment>.Get(context, pagesize);
         }
 
-        public RestRequest<Comment> Put(Comment comment)
+        public RestRequest<Comment> Create(Comment comment)
         {
-            return RestRequest<Comment>.Put(context)
-                .AddJsonToRequestBody(comment);
+            return RestRequest<Comment>.Post(context)
+                .WriteToRequest(comment);
         }
 
         public TrackCommentEndpoint this[int id] => new TrackCommentEndpoint(context, id);
@@ -91,10 +91,10 @@ namespace Gustnado.Endpoints
 
         public RestRequest<Comment> Get() => RestRequest<Comment>.Get(context);
 
-        public RestRequest<Comment> Put(Comment comment)
+        public RestRequest<Comment> Update(Comment comment)
         {
             return RestRequest<Comment>.Put(context)
-                .AddJsonToRequestBody(comment);
+                .WriteToRequest(comment);
         }
 
         public RestRequest<DeleteResponse> Delete() => RestRequest<DeleteResponse>.Delete(context);

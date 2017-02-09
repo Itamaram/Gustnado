@@ -1,9 +1,11 @@
 using System;
+using Gustnado.Attributes;
 using Gustnado.Converters;
 using Newtonsoft.Json;
 
 namespace Gustnado.Objects
 {
+    [RequestBodyKeyFormat("comment[{0}]")]
     public class Comment
     {
         /// <summary>

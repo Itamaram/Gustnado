@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Gustnado.Endpoints;
 using Gustnado.Enums;
@@ -19,7 +20,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase("best")]
         public void FilterQ(string q)
         {
-            ExecuteSearch(new TracksRequestFilter {Q = q})
+            ExecuteSearch(new TracksRequestFilter { Q = q })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track =>
                 {
@@ -32,7 +33,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase("chill", "dope")]
         public void FilterTags(params string[] tags)
         {
-            ExecuteSearch(new TracksRequestFilter {Tags = tags.ToList()})
+            ExecuteSearch(new TracksRequestFilter { Tags = tags.ToList() })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track =>
                 {
@@ -45,7 +46,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(TrackVisibility.Public)]
         public void FilterFilter(TrackVisibility visibility)
         {
-            ExecuteSearch(new TracksRequestFilter {Filter = visibility})
+            ExecuteSearch(new TracksRequestFilter { Filter = visibility })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.AreEqual(TrackVisibility.Public, track.Sharing));
         }
@@ -54,7 +55,7 @@ namespace Gustnado.Tests.Endpoints
         [Test]
         public void FilterPrivate()
         {
-            ExecuteSearch(new TracksRequestFilter {Filter = TrackVisibility.Private})
+            ExecuteSearch(new TracksRequestFilter { Filter = TrackVisibility.Private })
                 .Do(CollectionAssert.IsEmpty);
         }
 
@@ -68,7 +69,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(License.AttributionNonCommercialShareAlike)]
         public void FilterLicense(License license)
         {
-            ExecuteSearch(new TracksRequestFilter {License = license})
+            ExecuteSearch(new TracksRequestFilter { License = license })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.AreEqual(license, track.License));
         }
@@ -76,7 +77,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(120)]
         public void FilterBpmMin(int min)
         {
-            ExecuteSearch(new TracksRequestFilter {BpmFrom = min})
+            ExecuteSearch(new TracksRequestFilter { BpmFrom = min })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.LessOrEqual(min, track.BPM));
         }
@@ -84,7 +85,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(60)]
         public void FilterBpmMax(int max)
         {
-            ExecuteSearch(new TracksRequestFilter {BpmTo = max})
+            ExecuteSearch(new TracksRequestFilter { BpmTo = max })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.GreaterOrEqual(max, track.BPM));
         }
@@ -92,7 +93,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(60 * 60 * 1000)]
         public void FilterDurationMin(int min)
         {
-            ExecuteSearch(new TracksRequestFilter {DurationFrom = min})
+            ExecuteSearch(new TracksRequestFilter { DurationFrom = min })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.LessOrEqual(min, track.Duration));
         }
@@ -100,7 +101,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(5 * 1000)]
         public void FilterDurationMax(int max)
         {
-            ExecuteSearch(new TracksRequestFilter {DurationTo = max})
+            ExecuteSearch(new TracksRequestFilter { DurationTo = max })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.GreaterOrEqual(max, track.Duration));
         }
@@ -110,7 +111,7 @@ namespace Gustnado.Tests.Endpoints
         {
             var min = DateTime.Now - TimeSpan.Parse(span);
 
-            ExecuteSearch(new TracksRequestFilter {CreateAtFrom = min})
+            ExecuteSearch(new TracksRequestFilter { CreateAtFrom = min })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.LessOrEqual(min, track.CreatedAt));
         }
@@ -120,7 +121,7 @@ namespace Gustnado.Tests.Endpoints
         {
             var max = DateTime.Now - TimeSpan.Parse(span);
 
-            ExecuteSearch(new TracksRequestFilter {CreatedAtTo = max})
+            ExecuteSearch(new TracksRequestFilter { CreatedAtTo = max })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => Assert.GreaterOrEqual(max, track.CreatedAt));
         }
@@ -128,7 +129,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(215615250)]
         public void FilterIds(params int[] ids)
         {
-            ExecuteSearch(new TracksRequestFilter {Ids = ids.ToList()})
+            ExecuteSearch(new TracksRequestFilter { Ids = ids.ToList() })
                 .Do(tracks => CollectionAssert.AreEquivalent(ids, tracks.Select(t => t.Id)));
         }
 
@@ -136,7 +137,7 @@ namespace Gustnado.Tests.Endpoints
         //[TestCase("rap", "hiphop")] bug: Another SC API documentation lie?
         public void FilterGenres(params string[] genres)
         {
-            ExecuteSearch(new TracksRequestFilter {Genres = genres.ToList()})
+            ExecuteSearch(new TracksRequestFilter { Genres = genres.ToList() })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => StringAssert.Contains(track.Genre, genres));
         }
@@ -157,7 +158,7 @@ namespace Gustnado.Tests.Endpoints
         [TestCase(TrackType.Original, TrackType.Recording)]
         public void FilterTypes(params TrackType[] types)
         {
-            ExecuteSearch(new TracksRequestFilter {Types = types.ToList()})
+            ExecuteSearch(new TracksRequestFilter { Types = types.ToList() })
                 .Do(CollectionAssert.IsNotEmpty)
                 .ForEach(track => CollectionAssert.Contains(types, track.TrackType));
         }
@@ -201,8 +202,104 @@ namespace Gustnado.Tests.Endpoints
             Assert.AreEqual(Constants.ItamarId, favoriter.Id);
         }
 
-        //todo comment on a track goes here. But not uploading or favoriting?
+        private static readonly SoundCloudHttpClient authed = new TestClient().Authenticate();
+        private const string TestTrackTitle = "Gustnado Testing Track";
+        private const string TestCommentPrefix = "TestComment";
 
+        private static Track GetTestTrack()
+        {
+            return SoundCloudApi.Me.Tracks.Get().Execute(authed).First(t => t.Title == TestTrackTitle);
+        }
+
+        private static Comment GetTestComment()
+        {
+            return SoundCloudApi.Me.Comments.Get().Execute(authed).First(c => c.Body.StartsWith(TestCommentPrefix));
+        }
+
+        [Test, Order(0)]
+        public void UploadTrack()
+        {
+            var track = SoundCloudApi.Tracks.Create(new Track
+            {
+                Title = TestTrackTitle,
+                AssetData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "soundfile.wav")
+            }).Execute(authed);
+
+            Assert.NotNull(track.Id);
+        }
+
+        [Test, Order(1)]
+        public void UpdateTrack()
+        {
+            var track = GetTestTrack();
+
+            var guid = Guid.NewGuid();
+
+            SoundCloudApi.Tracks[track.Id.Value].Update(new Track
+            {
+                Description = guid.ToString()
+            }).Execute(authed)
+            .Do(t => Assert.AreEqual(guid.ToString(), t.Description));
+
+            GetTestTrack()
+                .Do(t => Assert.AreEqual(guid.ToString(), t.Description));
+            
+        }
+
+        [Test, Order(4)]
+        public void DeleteTrack()
+        {
+            var track = GetTestTrack();
+
+            var response = SoundCloudApi.Tracks[track.Id.Value].Delete().Execute(authed);
+            //Should assert stuff about the response here, but SC returns 500 even on success,
+            //so I can do just about nothing
+        }
+
+        [Test, Order(1)]
+        public void CreateComment()
+        {
+            GetTestTrack()
+                .Map(track => SoundCloudApi.Tracks[track.Id.Value].Comments.Create(new Comment
+                {
+                    Body = TestCommentPrefix
+                }))
+                .Execute(authed)
+                .Do(comment => Assert.IsNotNull(comment.Id));
+        }
+        
+        [Test, Order(2)]
+        [Ignore("API returns 500 for comment update")]
+        public void UpdateComment()
+        {
+            var guid = Guid.NewGuid();
+
+            var comment = GetTestComment()
+                .Map(c => SoundCloudApi.Tracks[c.TrackId.Value].Comments[c.Id.Value]);
+
+            comment.Update(new Comment
+                {
+                    Body = TestCommentPrefix + guid
+                })
+                .Execute(authed)
+                .Do(c => Assert.AreEqual(TestCommentPrefix + guid, c.Body));
+
+            comment.Get()
+                .Execute(authed)
+                .Do(c => Assert.AreEqual(TestCommentPrefix + guid, c.Body));
+
+        }
+
+        [Test, Order((3))]
+        public void DeleteComment()
+        {
+            var response = GetTestComment()
+                .Map(c => SoundCloudApi.Tracks[c.TrackId.Value].Comments[c.Id.Value].Delete())
+                .Execute(authed);
+
+            Assert.AreEqual("200 - OK", response.Status);
+        }
+        
         //todo SecretToken. Here? Or only on /Me?
     }
 }
